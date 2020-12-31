@@ -270,7 +270,8 @@
    will point to the new ELEMENT
   "
   (let
-    ((ring-size (dyn-ring-size ring-struct))
+    ((insert (dyn-ring-make-element insert))
+     (ring-size (dyn-ring-size ring-struct))
      (ring-head (car ring-struct)))
 
     (cond
