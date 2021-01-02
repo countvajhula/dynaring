@@ -100,35 +100,35 @@
     (aset new-elm dyn-ring-linkage (cons nil nil))
     new-elm))
 
-(defun dyn-ring-element-value ( element  )
+(defun dyn-ring-element-value (element)
   "dyn-ring-element-value ELEMENT
 
    Return the value of ELEMENT.
    "
   (aref element dyn-ring-value))
 
-(defun dyn-ring-set-element-value ( element value )
+(defun dyn-ring-set-element-value (element value)
   "dyn-ring-set-element-value ELEMENT VALUE
 
    Set the value of ELEMENT to VALUE.
   "
   (aset element dyn-ring-value value))
 
-(defun dyn-ring-element-linkage ( element  )
+(defun dyn-ring-element-linkage (element)
   "dyn-ring-element-linkage ELEMENT
 
    Return the linkage of ELEMENT.
    "
   (aref element dyn-ring-linkage))
 
-(defun dyn-ring-element-prev ( element  )
+(defun dyn-ring-element-prev (element)
   "dyn-ring-element-prev ELEMENT
 
    Return the previous element in the ring.
    "
   (car (dyn-ring-element-linkage element)))
 
-(defun dyn-ring-element-next ( element  )
+(defun dyn-ring-element-next (element)
   "dyn-ring-element-next ELEMENT
 
    Return the next element in the ring.
@@ -139,25 +139,25 @@
 ;; ring traversal.
 ;;
 
-(defun dyn-ring-traverse ( ring-struct fn )
+(defun dyn-ring-traverse (ring fn)
   "dyn-ring-traverse RING FN
 
    walk all of the elements in RING passing each
-   element to FN.
+   element to FN. This performs FN as a side effect and
+   does not modify the ring in any way.
   "
   (let
-    ((head (car ring-struct)))
+    ((head (dyn-ring-head ring)))
 
     (when head
       (funcall fn (dyn-ring-element-value head))
 
-      (let
-        ((current (cdr (aref head dyn-ring-linkage))))
+      (let ((current (dyn-ring-element-next head)))
 
         ;; loop until we return to the head
         (while (and current (not (eq current head)))
           (funcall fn (dyn-ring-element-value current))
-          (setq current (cdr (aref current dyn-ring-linkage))))
+          (setq current (dyn-ring-element-next current)))
         t))))
 
 (defun dyn-ring-map ( ring-struct map-fn )

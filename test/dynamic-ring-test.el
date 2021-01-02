@@ -52,6 +52,8 @@
   (should (= 1
              (dyn-ring-element-value
               (dyn-ring-make-element 1))))
+
+  ;; dyn-ring-set-element-value
   (let ((elem (dyn-ring-make-element 1)))
     (dyn-ring-set-element-value elem 2)
     (should (= 2
