@@ -121,14 +121,14 @@
     ((head (car ring-struct)))
 
     (when head
-      (funcall fn head)
+      (funcall fn (dyn-ring-element-value head))
 
       (let
         ((current (cdr (aref head dyn-ring-linkage))))
 
         ;; loop until we return to the head
         (while (and current (not (eq current head)))
-          (funcall fn current)
+          (funcall fn (dyn-ring-element-value current))
           (setq current (cdr (aref current dyn-ring-linkage))))
         t))))
 
@@ -144,7 +144,7 @@
 
     (dyn-ring-traverse ring-struct
       (lambda ( element )
-        (push (funcall map-fn (dyn-ring-element-value element)) output)))
+        (push (funcall map-fn element) output)))
 
     output))
 
