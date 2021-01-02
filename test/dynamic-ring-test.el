@@ -14,30 +14,41 @@
 ;;
 
 (require 'dynamic-ring)
+(require 'cl)
 
-(ert-deftest make-dyn-ring-test ()
-  (should (make-dyn-ring)))
+(ert-deftest dyn-ring-test ()
+  ;; null constructor
+  (should (make-dyn-ring))
 
-(ert-deftest dyn-ring-empty-p-test ()
+  ;; dyn-ring-empty-p
   (should (dyn-ring-empty-p (make-dyn-ring)))
   (let ((ring (make-dyn-ring)))
     (dyn-ring-insert ring 1)
-    (should-not (dyn-ring-empty-p ring))))
+    (should-not (dyn-ring-empty-p ring)))
 
-(ert-deftest dyn-ring-size-test ()
+  ;; dyn-ring-size
   (should (= 0 (dyn-ring-size (make-dyn-ring))))
   (let ((ring (make-dyn-ring)))
     (dyn-ring-insert ring 1)
-    (should (= 1 (dyn-ring-size ring)))))
+    (should (= 1 (dyn-ring-size ring))))
 
-(ert-deftest dyn-ring-value-test ()
+  ;; dyn-ring-head
+  (should (null (dyn-ring-head (make-dyn-ring))))
+  (let* ((ring (make-dyn-ring))
+         (elem (dyn-ring-insert ring 1)))
+    (should (equal elem (dyn-ring-head ring))))
+
+  ;; dyn-ring-value
   (should (null (dyn-ring-value (make-dyn-ring))))
   (let ((ring (make-dyn-ring)))
     (dyn-ring-insert ring 1)
     (should (= 1 (dyn-ring-value ring)))))
 
 (ert-deftest dyn-ring-element-test ()
+  ;; constructor
   (should (dyn-ring-make-element 1))
+
+  ;; dyn-ring-element-value
   (should (= 1
              (dyn-ring-element-value
               (dyn-ring-make-element 1))))
@@ -45,6 +56,8 @@
     (dyn-ring-set-element-value elem 2)
     (should (= 2
                (dyn-ring-element-value elem))))
+
+  ;; dyn-ring-element-prev and dyn-ring-element-next
   (let* ((ring (make-dyn-ring))
          (elem (dyn-ring-insert ring 1)))
     (should (null (dyn-ring-element-prev elem)))
