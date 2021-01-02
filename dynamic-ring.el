@@ -40,32 +40,32 @@
   "make-dyn-ring
 
    Return a new dynamic ring stucture. A ring structure is a cons
-   cell where the car is linked to the current head element of
+   cell where the car is the current head element of
    the ring, and the cdr is the number of elements in the ring.
   "
   (cons nil 0))
 
-(defun dyn-ring-empty-p ( ring-struct )
+(defun dyn-ring-empty-p (ring)
   "dyn-ring-empty-p RING
 
    return t if RING has no elements.
   "
-  (not (car ring-struct)))
+  (not (car ring)))
 
-(defun dyn-ring-size ( ring-struct )
+(defun dyn-ring-size (ring)
   "dyn-ring-size RING
 
    Return the number of elements in RING.
   "
-  (cdr ring-struct))
+  (cdr ring))
 
-(defun dyn-ring-value ( ring-struct )
+(defun dyn-ring-value (ring)
   "dyn-ring-value RING
 
    Return the value of RING's head element.
   "
-  (when (car ring-struct)
-    (aref (car ring-struct) dyn-ring-value)))
+  (when (car ring)
+    (dyn-ring-element-value (car ring))))
 
 ;;
 ;; ring elements
@@ -74,7 +74,7 @@
 (defconst dyn-ring-linkage 0)
 (defconst dyn-ring-value   1)
 
-(defun dyn-ring-make-element ( value )
+(defun dyn-ring-make-element (value)
   "dyn-ring-make-element VALUE
 
    Create a new dynamic ring element with VALUE.
@@ -106,6 +106,27 @@
    Set the value of ELEMENT to VALUE.
   "
   (aset element dyn-ring-value value))
+
+(defun dyn-ring-element-linkage ( element  )
+  "dyn-ring-element-linkage ELEMENT
+
+   Return the linkage of ELEMENT.
+   "
+  (aref element dyn-ring-linkage))
+
+(defun dyn-ring-element-prev ( element  )
+  "dyn-ring-element-prev ELEMENT
+
+   Return the previous element in the ring.
+   "
+  (car (dyn-ring-element-linkage element)))
+
+(defun dyn-ring-element-next ( element  )
+  "dyn-ring-element-next ELEMENT
+
+   Return the next element in the ring.
+   "
+  (cdr (dyn-ring-element-linkage element)))
 
 ;;
 ;; ring traversal.
