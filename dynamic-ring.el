@@ -52,6 +52,13 @@
   "
   (not (car ring)))
 
+(defun dyn-ring-head (ring)
+  "dyn-ring-head RING
+
+   Return the head element or \"gleam\" of the RING.
+  "
+  (car ring))
+
 (defun dyn-ring-size (ring)
   "dyn-ring-size RING
 
