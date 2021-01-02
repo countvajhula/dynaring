@@ -69,3 +69,39 @@
     (should (equal elem2 (dyn-ring-element-next elem)))
     (should (equal elem (dyn-ring-element-prev elem2)))
     (should (equal elem (dyn-ring-element-next elem2)))))
+
+(ert-deftest dyn-ring-traverse-test ()
+  ;; empty ring
+  (let ((ring (make-dyn-ring)))
+    (dyn-ring-traverse ring #'1+)
+    (should (dyn-ring-empty-p ring)))
+
+  ;; one-element ring
+  (let* ((ring (make-dyn-ring))
+         (memo (list)))
+    (letf ((memofn (lambda (arg)
+                     (push arg memo))))
+      (dyn-ring-insert ring 1)
+      (dyn-ring-traverse ring memofn)
+      (should (equal memo (list 1)))))
+
+  ;; two-element ring
+  (let* ((ring (make-dyn-ring))
+         (memo (list)))
+    (letf ((memofn (lambda (arg)
+                     (push arg memo))))
+      (dyn-ring-insert ring 1)
+      (dyn-ring-insert ring 2)
+      (dyn-ring-traverse ring memofn)
+      (should (equal memo (list 1 2)))))
+
+  ;; 3-element ring
+  (let* ((ring (make-dyn-ring))
+         (memo (list)))
+    (letf ((memofn (lambda (arg)
+                     (push arg memo))))
+      (dyn-ring-insert ring 1)
+      (dyn-ring-insert ring 2)
+      (dyn-ring-insert ring 3)
+      (dyn-ring-traverse ring memofn)
+      (should (equal memo (list 1 2 3))))))
