@@ -146,35 +146,40 @@
    element to FN. This performs FN as a side effect and
    does not modify the ring in any way.
   "
-  (let
-    ((head (dyn-ring-head ring)))
-
+  (let ((head (dyn-ring-head ring)))
     (when head
       (funcall fn (dyn-ring-element-value head))
-
       (let ((current (dyn-ring-element-next head)))
-
         ;; loop until we return to the head
         (while (and current (not (eq current head)))
           (funcall fn (dyn-ring-element-value current))
           (setq current (dyn-ring-element-next current)))
         t))))
 
-(defun dyn-ring-map ( ring-struct map-fn )
+(defun dyn-ring-traverse-collect (ring fn)
   "dyn-ring-map RING FN
 
    Walk the elements of RING passing each element to FN.  The
    values of FN for each element is collected into a list and
    returned.
   "
-  (lexical-let
-    ((output nil))
-
-    (dyn-ring-traverse ring-struct
-      (lambda ( element )
-        (push (funcall map-fn element) output)))
-
+  (let ((output nil))
+    (dyn-ring-traverse ring
+                       (lambda (element)
+                         (push (funcall fn element) output)))
     output))
+
+;; TODO:
+;; (1) map should return a new ring with the elements mapped
+;; (2) there should also be a mutating version that modifies the
+;;     existing ring under the map (maybe \"transform\")
+;; (3) and a function dyn-ring-values that returns a flat list of
+;;     values containined in the ring
+;; - dyn-ring-map
+;; - dyn-ring-filter
+;; - dyn-ring-transform-map
+;; - dyn-ring-transform-filter
+;; - dyn-ring-values
 
 (defun dyn-ring-rotate-until ( ring-struct direction fn )
   "dyn-ring-rotate-until RING DIRECTION FN
@@ -215,7 +220,7 @@
 
    The list of matching elements is returned.
   "
-  (lexical-let
+  (let
     ((found nil)
      (p     predicate))
 

@@ -74,9 +74,12 @@
 
 (ert-deftest dyn-ring-traverse-test ()
   ;; empty ring
-  (let ((ring (make-dyn-ring)))
-    (dyn-ring-traverse ring #'1+)
-    (should (dyn-ring-empty-p ring)))
+  (let ((ring (make-dyn-ring))
+        (memo (list)))
+    (letf ((memofn (lambda (arg)
+                     (push arg memo))))
+      (should-not (dyn-ring-traverse ring memofn))
+      (should (null memo))))
 
   ;; one-element ring
   (let* ((ring (make-dyn-ring))
@@ -84,7 +87,7 @@
     (letf ((memofn (lambda (arg)
                      (push arg memo))))
       (dyn-ring-insert ring 1)
-      (dyn-ring-traverse ring memofn)
+      (should (dyn-ring-traverse ring memofn))
       (should (equal memo (list 1)))))
 
   ;; two-element ring
@@ -94,7 +97,7 @@
                      (push arg memo))))
       (dyn-ring-insert ring 1)
       (dyn-ring-insert ring 2)
-      (dyn-ring-traverse ring memofn)
+      (should (dyn-ring-traverse ring memofn))
       (should (equal memo (list 1 2)))))
 
   ;; 3-element ring
@@ -105,5 +108,33 @@
       (dyn-ring-insert ring 1)
       (dyn-ring-insert ring 2)
       (dyn-ring-insert ring 3)
-      (dyn-ring-traverse ring memofn)
+      (should (dyn-ring-traverse ring memofn))
       (should (equal memo (list 1 2 3))))))
+
+(ert-deftest dyn-ring-traverse-collect-test ()
+  ;; empty ring
+  (let ((ring (make-dyn-ring)))
+    (let ((result (dyn-ring-traverse-collect ring #'1+)))
+      (should (null result))))
+
+  ;; one-element ring
+  (let ((ring (make-dyn-ring)))
+    (dyn-ring-insert ring 1)
+    (let ((result (dyn-ring-traverse-collect ring #'1+)))
+      (should (equal result (list 2)))))
+
+  ;; two-element ring
+  (let* ((ring (make-dyn-ring)))
+    (dyn-ring-insert ring 1)
+    (dyn-ring-insert ring 2)
+    (let ((result (dyn-ring-map ring #'1+)))
+      (should (equal result (list 2 3)))))
+
+  ;; 3-element ring
+  (let* ((ring (make-dyn-ring)))
+    (dyn-ring-insert ring 1)
+    (dyn-ring-insert ring 2)
+    (dyn-ring-insert ring 3)
+    (let ((result (dyn-ring-map ring #'1+)))
+      (should (equal result (list 2 3 4))))))
+
