@@ -1,4 +1,4 @@
-;;; dynamic-ring.el --- A dynamically sized ring structure.
+;;; dynamic-ring.el --- A dynamically sized ring structure. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Mike Mattie
 ;; Author: Mike Mattie codermattie@gmail.com
