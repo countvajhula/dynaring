@@ -308,60 +308,38 @@
         ;; only one link, so delete the head pointer.
         (setcar ring-struct nil)) )))
 
-(defun dyn-ring-link ( target insert )
-  "dyn-ring-link LEFT ELEMENT RIGHT
-  "
-  (let*
-    ((target-linkage (aref target dyn-ring-linkage))
-     (insert-linkage (aref insert dyn-ring-linkage))
+(defun dyn-ring--link (previous next)
+  "Link PREVIOUS and NEXT to one another."
+  (dyn-ring-element-set-previous next previous)
+  (dyn-ring-element-set-next previous next))
 
-     (left-side (car target-linkage))
-     (left-linkage (aref left-side dyn-ring-linkage)))
-
-    ;; double link the left of the target to insert
-    (setcdr left-linkage insert)
-    (setcar insert-linkage left-side)
-
-    ;; double link the right of insert
-    (setcdr insert-linkage target)
-    (setcar target-linkage insert) ))
-
-(defun dyn-ring-insert ( ring-struct insert )
+(defun dyn-ring-insert (ring element)
   "dyn-ring-insert RING ELEMENT
 
    Insert ELEMENT into RING. The head of the ring
-   will point to the new ELEMENT
+   will be the new ELEMENT
   "
-  (let
-    ((insert (dyn-ring-make-element insert))
-     (ring-size (dyn-ring-size ring-struct))
-     (ring-head (car ring-struct)))
-
+  (let ((element (dyn-ring-make-element element))
+        (ring-size (dyn-ring-size ring))
+        (head (dyn-ring-head ring)))
     (cond
-      ;; zero is a simple insert
+     ;; zero is a simple insert
+     ((equal 1 ring-size)
+      (dyn-ring--link element head)
+      (dyn-ring--link head element))
 
-      ((equal 1 ring-size)
-        (let
-          ((insert-linkage (aref insert dyn-ring-linkage))
-           (head-linkage (aref ring-head dyn-ring-linkage)))
+     ((> ring-size 1)
+      (let ((previous (dyn-ring-element-previous head)))
+        (dyn-ring--link previous element)
+        (dyn-ring--link element head))))
 
-          (setcar head-linkage insert)
-          (setcdr head-linkage insert)
+    ;; point the head at the new element
+    (dyn-ring-set-head ring element)
+    ;; update the element count.
+    (dyn-ring-set-size ring (1+ ring-size))
 
-          ;; link the new element to the head
-          (setcar insert-linkage ring-head)
-          (setcdr insert-linkage ring-head)))
-
-      ((> ring-size 1)
-        (dyn-ring-link ring-head insert)) )
-
-  ;; point the head at the new element
-  (setcar ring-struct insert)
-  ;; update the element count.
-  (setcdr ring-struct (+ ring-size 1))
-
-  ;; return the newly inserted element.
-  insert))
+    ;; return the newly inserted element.
+    element))
 
 (defun dyn-ring-link-left-to-right ( left right )
   "dyn-ring-link-left-to-right.
