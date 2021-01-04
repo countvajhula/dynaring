@@ -48,7 +48,7 @@
 (defun dyn-ring-head (ring)
   "dyn-ring-head RING
 
-   Return the head element of the RING.
+   Return the head segment of the RING.
   "
   (car ring))
 
@@ -83,31 +83,31 @@
 (defun dyn-ring-value (ring)
   "dyn-ring-value RING
 
-   Return the value of RING's head element.
+   Return the value of RING's head segment.
   "
   (let ((head (dyn-ring-head ring)))
     (when head
-      (dyn-ring-element-value head))))
+      (dyn-ring-segment-value head))))
 
 ;;
-;; ring elements
+;; ring segments
 ;;
 
 (defconst dyn-ring-linkage 0)
 (defconst dyn-ring-value   1)
 
-(defun dyn-ring-make-element (value)
-  "dyn-ring-make-element VALUE
+(defun dyn-ring-make-segment (value)
+  "dyn-ring-make-segment VALUE
 
-   Create a new dynamic ring element with VALUE.
+   Create a new dynamic ring segment with VALUE.
 
-   An element stores a value within a ring with linkage to the
-   other elements in the ring. It is an array.
+   A segment stores a value within a ring with linkage to the
+   other segments in the ring. It is an array.
 
    [linkage,value]
 
-   linkage is a cons cell. The car points to the left element in
-   the ring. The cdr points to the right element in the ring.
+   linkage is a cons cell. The car points to the left segment in
+   the ring. The cdr points to the right segment in the ring.
   "
   (let
     ((new-elm (make-vector 2 nil)))
@@ -115,54 +115,54 @@
     (aset new-elm dyn-ring-linkage (cons nil nil))
     new-elm))
 
-(defun dyn-ring-element-value (element)
-  "dyn-ring-element-value ELEMENT
+(defun dyn-ring-segment-value (segment)
+  "dyn-ring-segment-value SEGMENT
 
-   Return the value of ELEMENT.
+   Return the value of SEGMENT.
    "
-  (aref element dyn-ring-value))
+  (aref segment dyn-ring-value))
 
-(defun dyn-ring-set-element-value (element value)
-  "dyn-ring-set-element-value ELEMENT VALUE
+(defun dyn-ring-set-segment-value (segment value)
+  "dyn-ring-set-segment-value SEGMENT VALUE
 
-   Set the value of ELEMENT to VALUE.
+   Set the value of SEGMENT to VALUE.
   "
-  (aset element dyn-ring-value value))
+  (aset segment dyn-ring-value value))
 
-(defun dyn-ring-element-linkage (element)
-  "dyn-ring-element-linkage ELEMENT
+(defun dyn-ring-segment-linkage (segment)
+  "dyn-ring-segment-linkage SEGMENT
 
-   Return the linkage of ELEMENT.
+   Return the linkage of SEGMENT.
    "
-  (aref element dyn-ring-linkage))
+  (aref segment dyn-ring-linkage))
 
-(defun dyn-ring-element-previous (element)
-  "dyn-ring-element-previous ELEMENT
+(defun dyn-ring-segment-previous (segment)
+  "dyn-ring-segment-previous SEGMENT
 
-   Return the previous element in the ring.
+   Return the previous segment in the ring.
    "
-  (car (dyn-ring-element-linkage element)))
+  (car (dyn-ring-segment-linkage segment)))
 
-(defun dyn-ring-element-set-previous (element new-element)
-  "dyn-ring-element-set-previous ELEMENT
+(defun dyn-ring-segment-set-previous (segment new-segment)
+  "dyn-ring-segment-set-previous SEGMENT
 
-   Set the previous element in the ring to NEW-ELEMENT.
+   Set the previous segment in the ring to NEW-SEGMENT.
    "
-  (setcar (dyn-ring-element-linkage element) new-element))
+  (setcar (dyn-ring-segment-linkage segment) new-segment))
 
-(defun dyn-ring-element-next (element)
-  "dyn-ring-element-next ELEMENT
+(defun dyn-ring-segment-next (segment)
+  "dyn-ring-segment-next SEGMENT
 
-   Return the next element in the ring.
+   Return the next segment in the ring.
    "
-  (cdr (dyn-ring-element-linkage element)))
+  (cdr (dyn-ring-segment-linkage segment)))
 
-(defun dyn-ring-element-set-next (element new-element)
-  "dyn-ring-element-set-next ELEMENT
+(defun dyn-ring-segment-set-next (segment new-segment)
+  "dyn-ring-segment-set-next SEGMENT
 
-   Set the previous element in the ring to NEW-ELEMENT.
+   Set the previous segment in the ring to NEW-SEGMENT.
    "
-  (setcdr (dyn-ring-element-linkage element) new-element))
+  (setcdr (dyn-ring-segment-linkage segment) new-segment))
 
 ;;
 ;; ring traversal.
@@ -178,12 +178,12 @@
   "
   (let ((head (dyn-ring-head ring)))
     (when head
-      (funcall fn (dyn-ring-element-value head))
-      (let ((current (dyn-ring-element-next head)))
+      (funcall fn (dyn-ring-segment-value head))
+      (let ((current (dyn-ring-segment-next head)))
         ;; loop until we return to the head
         (while (and current (not (eq current head)))
-          (funcall fn (dyn-ring-element-value current))
-          (setq current (dyn-ring-element-next current)))
+          (funcall fn (dyn-ring-segment-value current))
+          (setq current (dyn-ring-segment-next current)))
         t))))
 
 (defun dyn-ring-traverse-collect (ring fn)
@@ -310,8 +310,8 @@
 
 (defun dyn-ring--link (previous next)
   "Link PREVIOUS and NEXT to one another."
-  (dyn-ring-element-set-previous next previous)
-  (dyn-ring-element-set-next previous next))
+  (dyn-ring-segment-set-previous next previous)
+  (dyn-ring-segment-set-next previous next))
 
 (defun dyn-ring-insert (ring element)
   "dyn-ring-insert RING ELEMENT
@@ -319,27 +319,27 @@
    Insert ELEMENT into RING. The head of the ring
    will be the new ELEMENT
   "
-  (let ((element (dyn-ring-make-element element))
+  (let ((segment (dyn-ring-make-segment element))
         (ring-size (dyn-ring-size ring))
         (head (dyn-ring-head ring)))
     (cond
      ;; zero is a simple insert
      ((equal 1 ring-size)
-      (dyn-ring--link element head)
-      (dyn-ring--link head element))
+      (dyn-ring--link segment head)
+      (dyn-ring--link head segment))
 
      ((> ring-size 1)
-      (let ((previous (dyn-ring-element-previous head)))
-        (dyn-ring--link previous element)
-        (dyn-ring--link element head))))
+      (let ((previous (dyn-ring-segment-previous head)))
+        (dyn-ring--link previous segment)
+        (dyn-ring--link segment head))))
 
-    ;; point the head at the new element
-    (dyn-ring-set-head ring element)
+    ;; point the head at the new segment
+    (dyn-ring-set-head ring segment)
     ;; update the element count.
     (dyn-ring-set-size ring (1+ ring-size))
 
-    ;; return the newly inserted element.
-    element))
+    ;; return the newly inserted segment.
+    segment))
 
 (defun dyn-ring-link-left-to-right ( left right )
   "dyn-ring-link-left-to-right.

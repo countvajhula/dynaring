@@ -44,33 +44,33 @@
     (dyn-ring-insert ring 1)
     (should (= 1 (dyn-ring-value ring)))))
 
-(ert-deftest dyn-ring-element-test ()
+(ert-deftest dyn-ring-segment-test ()
   ;; constructor
-  (should (dyn-ring-make-element 1))
+  (should (dyn-ring-make-segment 1))
 
-  ;; dyn-ring-element-value
+  ;; dyn-ring-segment-value
   (should (= 1
-             (dyn-ring-element-value
-              (dyn-ring-make-element 1))))
+             (dyn-ring-segment-value
+              (dyn-ring-make-segment 1))))
 
-  ;; dyn-ring-set-element-value
-  (let ((elem (dyn-ring-make-element 1)))
-    (dyn-ring-set-element-value elem 2)
+  ;; dyn-ring-set-segment-value
+  (let ((elem (dyn-ring-make-segment 1)))
+    (dyn-ring-set-segment-value elem 2)
     (should (= 2
-               (dyn-ring-element-value elem))))
+               (dyn-ring-segment-value elem))))
 
-  ;; dyn-ring-element-previous and dyn-ring-element-next
+  ;; dyn-ring-segment-previous and dyn-ring-segment-next
   (let* ((ring (make-dyn-ring))
          (elem (dyn-ring-insert ring 1)))
-    (should (null (dyn-ring-element-previous elem)))
-    (should (null (dyn-ring-element-next elem))))
+    (should (null (dyn-ring-segment-previous elem)))
+    (should (null (dyn-ring-segment-next elem))))
   (let* ((ring (make-dyn-ring))
          (elem (dyn-ring-insert ring 1))
          (elem2 (dyn-ring-insert ring 2)))
-    (should (equal elem2 (dyn-ring-element-previous elem)))
-    (should (equal elem2 (dyn-ring-element-next elem)))
-    (should (equal elem (dyn-ring-element-previous elem2)))
-    (should (equal elem (dyn-ring-element-next elem2)))))
+    (should (equal elem2 (dyn-ring-segment-previous elem)))
+    (should (equal elem2 (dyn-ring-segment-next elem)))
+    (should (equal elem (dyn-ring-segment-previous elem2)))
+    (should (equal elem (dyn-ring-segment-next elem2)))))
 
 (ert-deftest dyn-ring-traverse-test ()
   ;; empty ring
@@ -143,8 +143,8 @@
   (let ((ring (make-dyn-ring)))
     (should (dyn-ring-insert ring 1))
     (should (= 1 (dyn-ring-value ring)))
-    (should (null (dyn-ring-element-previous (dyn-ring-head ring))))
-    (should (null (dyn-ring-element-next (dyn-ring-head ring)))))
+    (should (null (dyn-ring-segment-previous (dyn-ring-head ring))))
+    (should (null (dyn-ring-segment-next (dyn-ring-head ring)))))
 
   ;; one-element ring
   (let* ((ring (make-dyn-ring))
@@ -152,13 +152,13 @@
     (let ((new (dyn-ring-insert ring 2)))
       (should new)
       (should (= 2 (dyn-ring-value ring)))
-      (should (eq (dyn-ring-element-previous new)
+      (should (eq (dyn-ring-segment-previous new)
                   elem1))
-      (should (eq (dyn-ring-element-next new)
+      (should (eq (dyn-ring-segment-next new)
                   elem1))
-      (should (eq (dyn-ring-element-previous elem1)
+      (should (eq (dyn-ring-segment-previous elem1)
                   new))
-      (should (eq (dyn-ring-element-next elem1)
+      (should (eq (dyn-ring-segment-next elem1)
                   new))))
 
   ;; two-element ring
@@ -168,16 +168,16 @@
     (let ((new (dyn-ring-insert ring 3)))
       (should new)
       (should (= 3 (dyn-ring-value ring)))
-      (should (eq (dyn-ring-element-previous new)
+      (should (eq (dyn-ring-segment-previous new)
                   elem1))
-      (should (eq (dyn-ring-element-next new)
+      (should (eq (dyn-ring-segment-next new)
                   elem2))
-      (should (eq (dyn-ring-element-previous elem1)
+      (should (eq (dyn-ring-segment-previous elem1)
                   elem2))
-      (should (eq (dyn-ring-element-next elem1)
+      (should (eq (dyn-ring-segment-next elem1)
                   new))
-      (should (eq (dyn-ring-element-previous elem2)
+      (should (eq (dyn-ring-segment-previous elem2)
                   new))
-      (should (eq (dyn-ring-element-next elem2)
+      (should (eq (dyn-ring-segment-next elem2)
                   elem1)))))
 
