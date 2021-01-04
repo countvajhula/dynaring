@@ -59,17 +59,17 @@
     (should (= 2
                (dyn-ring-element-value elem))))
 
-  ;; dyn-ring-element-prev and dyn-ring-element-next
+  ;; dyn-ring-element-previous and dyn-ring-element-next
   (let* ((ring (make-dyn-ring))
          (elem (dyn-ring-insert ring 1)))
-    (should (null (dyn-ring-element-prev elem)))
+    (should (null (dyn-ring-element-previous elem)))
     (should (null (dyn-ring-element-next elem))))
   (let* ((ring (make-dyn-ring))
          (elem (dyn-ring-insert ring 1))
          (elem2 (dyn-ring-insert ring 2)))
-    (should (equal elem2 (dyn-ring-element-prev elem)))
+    (should (equal elem2 (dyn-ring-element-previous elem)))
     (should (equal elem2 (dyn-ring-element-next elem)))
-    (should (equal elem (dyn-ring-element-prev elem2)))
+    (should (equal elem (dyn-ring-element-previous elem2)))
     (should (equal elem (dyn-ring-element-next elem2)))))
 
 (ert-deftest dyn-ring-traverse-test ()
@@ -127,7 +127,7 @@
   (let* ((ring (make-dyn-ring)))
     (dyn-ring-insert ring 1)
     (dyn-ring-insert ring 2)
-    (let ((result (dyn-ring-map ring #'1+)))
+    (let ((result (dyn-ring-traverse-collect ring #'1+)))
       (should (equal result (list 2 3)))))
 
   ;; 3-element ring
@@ -135,6 +135,6 @@
     (dyn-ring-insert ring 1)
     (dyn-ring-insert ring 2)
     (dyn-ring-insert ring 3)
-    (let ((result (dyn-ring-map ring #'1+)))
+    (let ((result (dyn-ring-traverse-collect ring #'1+)))
       (should (equal result (list 2 3 4))))))
 

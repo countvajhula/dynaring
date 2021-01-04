@@ -45,19 +45,26 @@
   "
   (cons nil 0))
 
+(defun dyn-ring-head (ring)
+  "dyn-ring-head RING
+
+   Return the head element of the RING.
+  "
+  (car ring))
+
+(defun dyn-ring-set-head (ring new-head)
+  "dyn-ring-set-head RING NEW-HEAD
+
+   Set the head of the RING to NEW-HEAD.
+  "
+  (setcar ring new-head))
+
 (defun dyn-ring-empty-p (ring)
   "dyn-ring-empty-p RING
 
    return t if RING has no elements.
   "
-  (not (car ring)))
-
-(defun dyn-ring-head (ring)
-  "dyn-ring-head RING
-
-   Return the head element or \"gleam\" of the RING.
-  "
-  (car ring))
+  (not (dyn-ring-head ring)))
 
 (defun dyn-ring-size (ring)
   "dyn-ring-size RING
@@ -66,13 +73,21 @@
   "
   (cdr ring))
 
+(defun dyn-ring-set-size (ring new-size)
+  "dyn-ring-set-size RING NEW-SIZE
+
+   Set the size of RING to NEW-SIZE.
+  "
+  (setcdr ring new-size))
+
 (defun dyn-ring-value (ring)
   "dyn-ring-value RING
 
    Return the value of RING's head element.
   "
-  (when (car ring)
-    (dyn-ring-element-value (car ring))))
+  (let ((head (dyn-ring-head ring)))
+    (when head
+      (dyn-ring-element-value head))))
 
 ;;
 ;; ring elements
@@ -121,12 +136,19 @@
    "
   (aref element dyn-ring-linkage))
 
-(defun dyn-ring-element-prev (element)
-  "dyn-ring-element-prev ELEMENT
+(defun dyn-ring-element-previous (element)
+  "dyn-ring-element-previous ELEMENT
 
    Return the previous element in the ring.
    "
   (car (dyn-ring-element-linkage element)))
+
+(defun dyn-ring-element-set-previous (element new-element)
+  "dyn-ring-element-set-previous ELEMENT
+
+   Set the previous element in the ring to NEW-ELEMENT.
+   "
+  (setcar (dyn-ring-element-linkage element) new-element))
 
 (defun dyn-ring-element-next (element)
   "dyn-ring-element-next ELEMENT
@@ -134,6 +156,13 @@
    Return the next element in the ring.
    "
   (cdr (dyn-ring-element-linkage element)))
+
+(defun dyn-ring-element-set-next (element new-element)
+  "dyn-ring-element-set-next ELEMENT
+
+   Set the previous element in the ring to NEW-ELEMENT.
+   "
+  (setcdr (dyn-ring-element-linkage element) new-element))
 
 ;;
 ;; ring traversal.
@@ -144,7 +173,8 @@
 
    walk all of the elements in RING passing each
    element to FN. This performs FN as a side effect and
-   does not modify the ring in any way.
+   does not modify the ring in any way, nor does it
+   return a result.
   "
   (let ((head (dyn-ring-head ring)))
     (when head
