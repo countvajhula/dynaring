@@ -436,3 +436,54 @@
                                          nil)))
     (should (eq seg3 (dyn-ring-head ring)))))
 
+(ert-deftest dyn-ring-find-test ()
+  ;; empty ring
+  (let ((ring (make-dyn-ring)))
+    (should-not (dyn-ring-find ring (lambda (element) t))))
+
+  ;; 1-element ring
+  (let* ((ring (make-dyn-ring))
+         (segment (dyn-ring-insert ring 1)))
+    (should (equal (list 1)
+                   (dyn-ring-find ring
+                                  (lambda (element)
+                                    (= 1 element)))))
+    (should-not (dyn-ring-find ring
+                               (lambda (element)
+                                 nil))))
+
+  ;; 2-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
+    (should (equal (list 1)
+                   (dyn-ring-find ring
+                                  (lambda (element)
+                                    (= 1 element)))))
+    (let ((result (dyn-ring-find ring
+                                 (lambda (element)
+                                   (> element 0)))))
+      (should (member 1 result))
+      (should (member 2 result)))
+    (should-not (dyn-ring-find ring
+                               (lambda (element)
+                                 nil))))
+
+  ;; 3-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should (equal (list 1)
+                   (dyn-ring-find ring
+                                  (lambda (element)
+                                    (= 1 element)))))
+    (let ((result (dyn-ring-find ring
+                                 (lambda (element)
+                                   (> element 1)))))
+      (should (member 2 result))
+      (should (member 3 result))
+      (should-not (member 1 result)))
+    (should-not (dyn-ring-find ring
+                               (lambda (element)
+                                 nil)))))
