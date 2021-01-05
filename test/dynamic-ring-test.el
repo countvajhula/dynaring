@@ -62,6 +62,7 @@
   ;; dyn-ring-segment-previous and dyn-ring-segment-next
   (let* ((ring (make-dyn-ring))
          (elem (dyn-ring-insert ring 1)))
+    ;; TODO: should be a trivial ring rather than a non-ring
     (should (null (dyn-ring-segment-previous elem)))
     (should (null (dyn-ring-segment-next elem))))
   (let* ((ring (make-dyn-ring))
@@ -143,6 +144,7 @@
   (let ((ring (make-dyn-ring)))
     (should (dyn-ring-insert ring 1))
     (should (= 1 (dyn-ring-value ring)))
+    ;; TODO: should be a trivial ring rather than a non-ring
     (should (null (dyn-ring-segment-previous (dyn-ring-head ring))))
     (should (null (dyn-ring-segment-next (dyn-ring-head ring)))))
 
@@ -217,4 +219,79 @@
     (should (eq seg2 (dyn-ring-rotate-right ring)))
     (should (eq seg1 (dyn-ring-rotate-right ring)))
     (should (eq seg3 (dyn-ring-rotate-right ring)))))
+
+(ert-deftest dyn-ring-delete-test ()
+  ;; empty ring
+  (let ((ring (make-dyn-ring))
+        (segment (dyn-ring-make-segment 1)))
+    (should (null (dyn-ring-delete ring segment)))
+    (should (dyn-ring-empty-p ring)))
+
+  ;; 1-element ring
+  (let* ((ring (make-dyn-ring))
+         (segment (dyn-ring-insert ring 1)))
+    (should (dyn-ring-delete ring segment))
+    (should (dyn-ring-empty-p ring)))
+
+  ;; 2-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
+    ;; delete head
+    (should (dyn-ring-delete ring seg2))
+    (should (= 1 (dyn-ring-size ring)))
+    (should (eq seg1 (dyn-ring-head ring)))
+    ;; TODO: trivial ring
+    ;; (should (eq (dyn-ring-segment-next seg1) seg1))
+    ;; (should (eq (dyn-ring-segment-previous seg1) seg1))
+    )
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
+    ;; delete non-head
+    (should (dyn-ring-delete ring seg1))
+    (should (= 1 (dyn-ring-size ring)))
+    (should (eq seg2 (dyn-ring-head ring)))
+    ;; TODO: trivial ring
+    ;; (should (eq (dyn-ring-segment-next seg2) seg2))
+    ;; (should (eq (dyn-ring-segment-previous seg2) seg2))
+    )
+
+  ;; 3-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    ;; delete head
+    (should (dyn-ring-delete ring seg3))
+    (should (= 2 (dyn-ring-size ring)))
+    (should (eq seg2 (dyn-ring-head ring)))
+    (should (eq (dyn-ring-segment-next seg2) seg1))
+    (should (eq (dyn-ring-segment-previous seg2) seg1))
+    (should (eq (dyn-ring-segment-next seg1) seg2))
+    (should (eq (dyn-ring-segment-previous seg1) seg2)))
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    ;; delete right
+    (should (dyn-ring-delete ring seg2))
+    (should (= 2 (dyn-ring-size ring)))
+    (should (eq seg3 (dyn-ring-head ring)))
+    (should (eq (dyn-ring-segment-next seg3) seg1))
+    (should (eq (dyn-ring-segment-previous seg3) seg1))
+    (should (eq (dyn-ring-segment-next seg1) seg3))
+    (should (eq (dyn-ring-segment-previous seg1) seg3)))
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    ;; delete left
+    (should (dyn-ring-delete ring seg1))
+    (should (= 2 (dyn-ring-size ring)))
+    (should (eq seg3 (dyn-ring-head ring)))
+    (should (eq (dyn-ring-segment-next seg3) seg2))
+    (should (eq (dyn-ring-segment-previous seg3) seg2))
+    (should (eq (dyn-ring-segment-next seg2) seg3))
+    (should (eq (dyn-ring-segment-previous seg2) seg3))))
 
