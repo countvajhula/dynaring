@@ -411,46 +411,27 @@
           (setcdr ring-struct (- (cdr ring-struct) 1))
           t)) )))
 
-(defun dyn-ring-rotate ( ring-struct direction )
-  "dyn-ring-rotate RING DIRECTION
-
-   - INTERNAL -
-
-   This is an internal function. To rotate the ring use
-   dyn-ring-rotate-left or dyn-ring-rotate-right.
-
-   Rotate the ring in DIRECTION: left = 'car , right = 'cdr.
-   If the ring is empty nil is returned. If the ring
-   has a single element the element is returned.
-
-   Otherwise the head of the ring is set to the element
-   of DIRECTION, and the element is returned.
-  "
-  (let
-    ((linkage (dyn-ring-head-linkage ring-struct)))
-
-    (when linkage
-      (let
-        ((link-to (funcall direction linkage)))
-
-        (if link-to
-          (setcar ring-struct link-to)) )) ))
-
-(defun dyn-ring-rotate-left ( ring-struct )
+(defun dyn-ring-rotate-left (ring)
   "dyn-ring-rotate-left RING
 
    Rotate the head of ring to the element left of the current
    head.
   "
-  (dyn-ring-rotate ring-struct 'car))
+  (unless (dyn-ring-empty-p ring)
+    (dyn-ring-set-head ring
+                       (dyn-ring-segment-previous
+                        (dyn-ring-head ring)))))
 
-(defun dyn-ring-rotate-right ( ring-struct )
+(defun dyn-ring-rotate-right (ring)
   "dyn-ring-rotate-right RING
 
    Rotate the head of ring to the element right of the current
    head.
   "
-  (dyn-ring-rotate ring-struct 'cdr))
+  (unless (dyn-ring-empty-p ring)
+    (dyn-ring-set-head ring
+                       (dyn-ring-segment-next
+                        (dyn-ring-head ring)))))
 
 (provide 'dynamic-ring)
 ;;; dynamic-ring.el ends here
