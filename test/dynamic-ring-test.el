@@ -16,6 +16,12 @@
 (require 'dynamic-ring)
 (require 'cl)
 
+;;
+;; Fixtures
+;;
+
+;; fixture recipe from:
+;; https://www.gnu.org/software/emacs/manual/html_node/ert/Fixtures-and-Test-Suites.html
 (defun fixture-0-ring (body)
   (unwind-protect
       (let ((ring (make-dyn-ring)))
@@ -42,6 +48,10 @@
              (seg3 (dyn-ring-insert ring 3)))
         (funcall body))))
 
+;;
+;; Test utilities
+;;
+
 (defun segments-are-linked-p (previous next)
   (and (eq (dyn-ring-segment-next previous) next)
        (eq (dyn-ring-segment-previous next) previous)))
@@ -49,6 +59,10 @@
 (defun segment-is-free-p (segment)
   (and (null (dyn-ring-segment-next segment))
        (null (dyn-ring-segment-previous segment))))
+
+;;
+;; Tests
+;;
 
 (ert-deftest dyn-ring-test ()
   ;; null constructor
@@ -105,6 +119,53 @@
     (should (eq seg2 (dyn-ring-segment-next seg1)))
     (should (eq seg1 (dyn-ring-segment-previous seg2)))
     (should (eq seg1 (dyn-ring-segment-next seg2)))))
+
+(ert-deftest dyn-ring-equal-p-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (let* ((r2 (make-dyn-ring))
+            (r3 (make-dyn-ring)))
+       (dyn-ring-insert r3 1)
+       (should (dyn-ring-equal-p ring r2))
+       (should-not (dyn-ring-equal-p ring r3)))))
+
+  ;; 1-element ring
+  (fixture-1-ring
+   (lambda ()
+     (let* ((r2 (make-dyn-ring))
+            (r3 (make-dyn-ring)))
+       (dyn-ring-insert r2 1)
+       (dyn-ring-insert r3 1)
+       (dyn-ring-insert r3 1)
+       (should (dyn-ring-equal-p ring r2))
+       (should-not (dyn-ring-equal-p ring r3)))))
+
+  ;; 2-element ring
+  (fixture-2-ring
+   (lambda ()
+     (let* ((r2 (make-dyn-ring))
+            (r3 (make-dyn-ring)))
+       (dyn-ring-insert r2 1)
+       (dyn-ring-insert r2 2)
+       (dyn-ring-insert r3 1)
+       (dyn-ring-insert r3 1)
+       (should (dyn-ring-equal-p ring r2))
+       (should-not (dyn-ring-equal-p ring r3)))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (let* ((r2 (make-dyn-ring))
+            (r3 (make-dyn-ring)))
+       (dyn-ring-insert r2 1)
+       (dyn-ring-insert r2 2)
+       (dyn-ring-insert r2 3)
+       (dyn-ring-insert r3 1)
+       (dyn-ring-insert r3 3)
+       (dyn-ring-insert r3 2)
+       (should (dyn-ring-equal-p ring r2))
+       (should-not (dyn-ring-equal-p ring r3))))))
 
 (ert-deftest dyn-ring-traverse-test ()
   ;; empty ring

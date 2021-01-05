@@ -89,6 +89,11 @@
     (when head
       (dyn-ring-segment-value head))))
 
+(defun dyn-ring-equal-p (r1 r2)
+  "Check if two rings are equal in their values and structure."
+  (equal (dyn-ring-values r1)
+         (dyn-ring-values r2)))
+
 ;;
 ;; ring segments
 ;;
