@@ -293,20 +293,25 @@
         (progn
           ;; There is more than one element. Break the ring by
           ;; terminating the left element
-          (setcdr (cdr linkage) nil)
+          (setcdr (aref (car linkage) dyn-ring-linkage) nil)
+          (setcar (aref (car linkage) dyn-ring-linkage) nil)
 
-        (while (cdr linkage)
-          (let
-            ((right (cdr linkage)))
+          (while (cdr linkage)
+            (let
+                ((right (cdr linkage)))
 
-            ;; delete all the links in the current element
-            (setcdr linkage nil)
-            (setcar linkage nil)
+              ;; delete all the links in the current element
+              (setcdr linkage nil)
+              (setcar linkage nil)
 
-            ;; move to the right
-            (setq linkage (aref right dyn-ring-linkage)) )))
+              ;; move to the right
+              (setq linkage (aref right dyn-ring-linkage)) ))
+          ;; delete the head pointer
+          (setcar ring-struct nil))
         ;; only one link, so delete the head pointer.
-        (setcar ring-struct nil)) )))
+        (setcar ring-struct nil))
+      (setcdr ring-struct 0)
+      t)))
 
 (defun dyn-ring--link (previous next)
   "Link PREVIOUS and NEXT to one another."
