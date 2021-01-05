@@ -16,6 +16,32 @@
 (require 'dynamic-ring)
 (require 'cl)
 
+(defun fixture-0-ring (body)
+  (unwind-protect
+      (let ((ring (make-dyn-ring)))
+        (funcall body))))
+
+(defun fixture-1-ring (body)
+  (unwind-protect
+      (let* ((ring (make-dyn-ring))
+             (segment (dyn-ring-insert ring 1)))
+        (funcall body))))
+
+(defun fixture-2-ring (body)
+  (unwind-protect
+      (let* ((ring (make-dyn-ring))
+             (seg1 (dyn-ring-insert ring 1))
+             (seg2 (dyn-ring-insert ring 2)))
+        (funcall body))))
+
+(defun fixture-3-ring (body)
+  (unwind-protect
+      (let* ((ring (make-dyn-ring))
+             (seg1 (dyn-ring-insert ring 1))
+             (seg2 (dyn-ring-insert ring 2))
+             (seg3 (dyn-ring-insert ring 3)))
+        (funcall body))))
+
 (defun segments-are-linked-p (previous next)
   (and (eq (dyn-ring-segment-next previous) next)
        (eq (dyn-ring-segment-previous next) previous)))
@@ -43,8 +69,8 @@
   ;; dyn-ring-head
   (should (null (dyn-ring-head (make-dyn-ring))))
   (let* ((ring (make-dyn-ring))
-         (elem (dyn-ring-insert ring 1)))
-    (should (equal elem (dyn-ring-head ring))))
+         (segment (dyn-ring-insert ring 1)))
+    (should (equal segment (dyn-ring-head ring))))
 
   ;; dyn-ring-value
   (should (null (dyn-ring-value (make-dyn-ring))))
@@ -62,10 +88,10 @@
               (dyn-ring-make-segment 1))))
 
   ;; dyn-ring-set-segment-value
-  (let ((elem (dyn-ring-make-segment 1)))
-    (dyn-ring-set-segment-value elem 2)
+  (let ((segment (dyn-ring-make-segment 1)))
+    (dyn-ring-set-segment-value segment 2)
     (should (= 2
-               (dyn-ring-segment-value elem))))
+               (dyn-ring-segment-value segment))))
 
   ;; dyn-ring-segment-previous and dyn-ring-segment-next
   (let* ((ring (make-dyn-ring))
@@ -73,12 +99,12 @@
     (should (eq head (dyn-ring-segment-previous head)))
     (should (eq head (dyn-ring-segment-next head))))
   (let* ((ring (make-dyn-ring))
-         (elem (dyn-ring-insert ring 1))
-         (elem2 (dyn-ring-insert ring 2)))
-    (should (eq elem2 (dyn-ring-segment-previous elem)))
-    (should (eq elem2 (dyn-ring-segment-next elem)))
-    (should (eq elem (dyn-ring-segment-previous elem2)))
-    (should (eq elem (dyn-ring-segment-next elem2)))))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
+    (should (eq seg2 (dyn-ring-segment-previous seg1)))
+    (should (eq seg2 (dyn-ring-segment-next seg1)))
+    (should (eq seg1 (dyn-ring-segment-previous seg2)))
+    (should (eq seg1 (dyn-ring-segment-next seg2)))))
 
 (ert-deftest dyn-ring-traverse-test ()
   ;; empty ring
@@ -156,23 +182,23 @@
 
   ;; one-element ring
   (let* ((ring (make-dyn-ring))
-         (elem1 (dyn-ring-insert ring 1)))
+         (segment (dyn-ring-insert ring 1)))
     (let ((new (dyn-ring-insert ring 2)))
       (should new)
       (should (= 2 (dyn-ring-value ring)))
-      (should (segments-are-linked-p elem1 new))
-      (should (segments-are-linked-p new elem1))))
+      (should (segments-are-linked-p segment new))
+      (should (segments-are-linked-p new segment))))
 
   ;; two-element ring
   (let* ((ring (make-dyn-ring))
-         (elem1 (dyn-ring-insert ring 1))
-         (elem2 (dyn-ring-insert ring 2)))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
     (let ((new (dyn-ring-insert ring 3)))
       (should new)
       (should (= 3 (dyn-ring-value ring)))
-      (should (segments-are-linked-p elem1 new))
-      (should (segments-are-linked-p new elem2))
-      (should (segments-are-linked-p elem2 elem1)))))
+      (should (segments-are-linked-p seg1 new))
+      (should (segments-are-linked-p new seg2))
+      (should (segments-are-linked-p seg2 seg1)))))
 
 (ert-deftest dyn-ring-rotate-test ()
   ;; empty ring
@@ -408,7 +434,9 @@
 (ert-deftest dyn-ring-find-test ()
   ;; empty ring
   (let ((ring (make-dyn-ring)))
-    (should-not (dyn-ring-find ring (lambda (element) t))))
+    (should-not (dyn-ring-find ring
+                               (lambda (element)
+                                 t))))
 
   ;; 1-element ring
   (let* ((ring (make-dyn-ring))
@@ -456,32 +484,6 @@
     (should-not (dyn-ring-find ring
                                (lambda (element)
                                  nil)))))
-
-(defun fixture-0-ring (body)
-  (unwind-protect
-      (let ((ring (make-dyn-ring)))
-        (funcall body))))
-
-(defun fixture-1-ring (body)
-  (unwind-protect
-      (let* ((ring (make-dyn-ring))
-             (segment (dyn-ring-insert ring 1)))
-        (funcall body))))
-
-(defun fixture-2-ring (body)
-  (unwind-protect
-      (let* ((ring (make-dyn-ring))
-             (seg1 (dyn-ring-insert ring 1))
-             (seg2 (dyn-ring-insert ring 2)))
-        (funcall body))))
-
-(defun fixture-3-ring (body)
-  (unwind-protect
-      (let* ((ring (make-dyn-ring))
-             (seg1 (dyn-ring-insert ring 1))
-             (seg2 (dyn-ring-insert ring 2))
-             (seg3 (dyn-ring-insert ring 3)))
-        (funcall body))))
 
 (ert-deftest dyn-ring-values-test ()
   ;; empty ring
