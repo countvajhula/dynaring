@@ -265,17 +265,7 @@
 ;; ring modification functions.
 ;;
 
-(defun dyn-ring-head-linkage ( ring-struct )
-  "dyn-ring-head-linkage RING
-
-   Return the linkage of the head element.
-  "
-
-  (let
-    ((head (car ring-struct)))
-    (when head (aref head dyn-ring-linkage))))
-
-(defun dyn-ring-destroy ( ring-struct )
+(defun dyn-ring-destroy (ring)
   "dyn-ring-destroy  RING
 
    - INTERNAL -
@@ -284,33 +274,27 @@
    makes it doubtful that the garbage collector will be able to
    free a ring without calling dyn-ring-destroy.
   "
-  (let
-    ((linkage (dyn-ring-head-linkage ring-struct)))
+  (unless (dyn-ring-empty-p ring)
+    (let
+        ((current (dyn-ring-head ring)))
 
-    (when linkage
+      (when (dyn-ring-segment-next current)
+        ;; There is more than one element. Break the ring by
+        ;; terminating the previous element
+        (dyn-ring--free-segment (dyn-ring-segment-previous current))
 
-      (if (cdr linkage)
-        (progn
-          ;; There is more than one element. Break the ring by
-          ;; terminating the left element
-          (setcdr (aref (car linkage) dyn-ring-linkage) nil)
-          (setcar (aref (car linkage) dyn-ring-linkage) nil)
+        (while (dyn-ring-segment-next current)
+          (let
+              ((next (dyn-ring-segment-next current)))
 
-          (while (cdr linkage)
-            (let
-                ((right (cdr linkage)))
+            ;; delete all the links in the current element
+            (dyn-ring--free-segment current)
 
-              ;; delete all the links in the current element
-              (setcdr linkage nil)
-              (setcar linkage nil)
-
-              ;; move to the right
-              (setq linkage (aref right dyn-ring-linkage)) ))
-          ;; delete the head pointer
-          (setcar ring-struct nil))
-        ;; only one link, so delete the head pointer.
-        (setcar ring-struct nil))
-      (setcdr ring-struct 0)
+            ;; move to the right
+            (setq current next))))
+      ;; delete the head pointer.
+      (dyn-ring-set-head ring nil)
+      (dyn-ring-set-size ring 0)
       t)))
 
 (defun dyn-ring--link (previous next)
