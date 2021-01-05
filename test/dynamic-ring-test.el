@@ -568,3 +568,27 @@
    (lambda ()
      (let ((result (dyn-ring-map ring #'identity)))
        (should (dyn-ring-equal-p result ring))))))
+
+(ert-deftest dyn-ring-transform-map-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (should-not (dyn-ring-transform-map ring #'1+))))
+
+  ;; one-element ring
+  (fixture-1-ring
+   (lambda ()
+     (should (dyn-ring-transform-map ring #'1+))
+     (should (equal (list 2) (dyn-ring-values ring)))))
+
+  ;; two-element ring
+  (fixture-2-ring
+   (lambda ()
+     (should (dyn-ring-transform-map ring #'1+))
+     (should (equal (list 2 3) (dyn-ring-values ring)))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (should (dyn-ring-transform-map ring #'1+))
+     (should (equal (list 2 3 4) (dyn-ring-values ring))))))

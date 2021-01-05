@@ -224,6 +224,24 @@
           (dyn-ring-set-head new-ring new-head)
           new-ring)))))
 
+(defun dyn-ring-transform-map (ring fn)
+  "dyn-ring-map RING FN
+
+   Transform the RING by mapping each of its elements under FN.
+   This mutates the existing ring.
+  "
+  (unless (dyn-ring-empty-p ring)
+    (let ((head (dyn-ring-head ring)))
+      (dyn-ring-segment-set-value head
+                                  (funcall fn (dyn-ring-segment-value head)))
+      (let ((current (dyn-ring-segment-previous head)))
+        (while (not (eq current head))
+          (dyn-ring-segment-set-value current
+                                      (funcall fn (dyn-ring-segment-value current)))
+          (setq current (dyn-ring-segment-previous current))))
+      (dyn-ring-set-head ring head)
+      t)))
+
 
 ;; TODO:
 ;; (1) map should return a new ring with the elements mapped
