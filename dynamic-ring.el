@@ -192,7 +192,7 @@
         t))))
 
 (defun dyn-ring-traverse-collect (ring fn)
-  "dyn-ring-map RING FN
+  "dyn-ring-traverse-collect RING FN
 
    Walk the elements of RING passing each element to FN.  The
    values of FN for each element is collected into a list and
@@ -203,6 +203,27 @@
                        (lambda (element)
                          (push (funcall fn element) output)))
     output))
+
+(defun dyn-ring-map (ring fn)
+  "dyn-ring-map RING FN
+
+   Walk the elements of RING passing each element to FN, creating
+   a new ring containing the transformed elements.
+  "
+  (let ((new-ring (make-dyn-ring)))
+    (if (dyn-ring-empty-p ring)
+        new-ring
+      (let ((head (dyn-ring-head ring)))
+        (let ((new-head (dyn-ring-insert new-ring
+                                         (funcall fn (dyn-ring-segment-value head)))))
+          (let ((current (dyn-ring-segment-previous head)))
+            (while (not (eq current head))
+              (dyn-ring-insert new-ring
+                               (funcall fn (dyn-ring-segment-value current)))
+              (setq current (dyn-ring-segment-previous current))))
+          (dyn-ring-set-head new-ring new-head)
+          new-ring)))))
+
 
 ;; TODO:
 ;; (1) map should return a new ring with the elements mapped

@@ -535,3 +535,36 @@
   (fixture-3-ring
    (lambda ()
      (should (equal (list 1 2 3) (dyn-ring-values ring))))))
+
+(ert-deftest dyn-ring-map-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (let ((result (dyn-ring-map ring #'1+)))
+       (should (dyn-ring-empty-p result)))))
+
+  ;; one-element ring
+  (fixture-1-ring
+   (lambda ()
+     (let ((result (dyn-ring-map ring #'1+)))
+       (should (equal (dyn-ring-values result)
+                      (seq-map #'1+ (dyn-ring-values ring)))))))
+
+  ;; two-element ring
+  (fixture-2-ring
+   (lambda ()
+     (let ((result (dyn-ring-map ring #'1+)))
+       (should (equal (dyn-ring-values result)
+                      (seq-map #'1+ (dyn-ring-values ring)))))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (let ((result (dyn-ring-map ring #'1+)))
+       (should (equal (dyn-ring-values result)
+                      (seq-map #'1+ (dyn-ring-values ring)))))))
+  ;; copy ring
+  (fixture-3-ring
+   (lambda ()
+     (let ((result (dyn-ring-map ring #'identity)))
+       (should (dyn-ring-equal-p result ring))))))
