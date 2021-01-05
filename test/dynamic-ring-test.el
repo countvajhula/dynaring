@@ -181,3 +181,40 @@
       (should (eq (dyn-ring-segment-next elem2)
                   elem1)))))
 
+(ert-deftest dyn-ring-rotate-test ()
+  ;; empty ring
+  (let ((ring (make-dyn-ring)))
+    (should (null (dyn-ring-rotate-left ring)))
+    (should (null (dyn-ring-rotate-right ring))))
+
+  ;; 1-element ring
+  (let* ((ring (make-dyn-ring))
+         (segment (dyn-ring-insert ring 1)))
+    ;; TODO: this should be a trivial ring rather than
+    ;; a non-ring
+    ;; (should (eq segment (dyn-ring-rotate-left ring)))
+    ;; (should (eq segment (dyn-ring-rotate-right ring)))
+    (should (null (dyn-ring-rotate-left ring)))
+    (should (null (dyn-ring-rotate-right ring))))
+
+  ;; 2-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
+    (should (eq seg1 (dyn-ring-rotate-left ring)))
+    (should (eq seg2 (dyn-ring-rotate-left ring)))
+    (should (eq seg1 (dyn-ring-rotate-right ring)))
+    (should (eq seg2 (dyn-ring-rotate-right ring))))
+
+  ;; 3-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should (eq seg1 (dyn-ring-rotate-left ring)))
+    (should (eq seg2 (dyn-ring-rotate-left ring)))
+    (should (eq seg3 (dyn-ring-rotate-left ring)))
+    (should (eq seg2 (dyn-ring-rotate-right ring)))
+    (should (eq seg1 (dyn-ring-rotate-right ring)))
+    (should (eq seg3 (dyn-ring-rotate-right ring)))))
+
