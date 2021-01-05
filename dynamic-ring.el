@@ -388,5 +388,16 @@ if the segment happens to point to itself).
                        (dyn-ring-segment-next
                         (dyn-ring-head ring)))))
 
+(defun dyn-ring-values (ring)
+  "dyn-ring-values RING
+
+   A list of all values contained in the RING.
+  "
+  (let ((result nil))
+    (dyn-ring-traverse-collect ring
+                               (lambda (element)
+                                 (push element result)))
+    result))
+
 (provide 'dynamic-ring)
 ;;; dynamic-ring.el ends here

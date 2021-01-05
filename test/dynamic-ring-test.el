@@ -456,3 +456,50 @@
     (should-not (dyn-ring-find ring
                                (lambda (element)
                                  nil)))))
+
+(defun fixture-0-ring (body)
+  (unwind-protect
+      (let ((ring (make-dyn-ring)))
+        (funcall body))))
+
+(defun fixture-1-ring (body)
+  (unwind-protect
+      (let* ((ring (make-dyn-ring))
+             (segment (dyn-ring-insert ring 1)))
+        (funcall body))))
+
+(defun fixture-2-ring (body)
+  (unwind-protect
+      (let* ((ring (make-dyn-ring))
+             (seg1 (dyn-ring-insert ring 1))
+             (seg2 (dyn-ring-insert ring 2)))
+        (funcall body))))
+
+(defun fixture-3-ring (body)
+  (unwind-protect
+      (let* ((ring (make-dyn-ring))
+             (seg1 (dyn-ring-insert ring 1))
+             (seg2 (dyn-ring-insert ring 2))
+             (seg3 (dyn-ring-insert ring 3)))
+        (funcall body))))
+
+(ert-deftest dyn-ring-values-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (should (null (dyn-ring-values ring)))))
+
+  ;; 1-element ring
+  (fixture-1-ring
+   (lambda ()
+     (should (equal (list 1) (dyn-ring-values ring)))))
+
+  ;; 2-element ring
+  (fixture-2-ring
+   (lambda ()
+     (should (equal (list 1 2) (dyn-ring-values ring)))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (should (equal (list 1 2 3) (dyn-ring-values ring))))))
