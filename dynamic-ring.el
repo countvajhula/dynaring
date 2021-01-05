@@ -243,7 +243,7 @@
           (funcall direction ring))
         nil)) ))
 
-(defun dyn-ring-find ( ring-struct predicate )
+(defun dyn-ring-find (ring predicate)
   "dyn-ring-find RING PREDICATE
 
    Search RING for elements matching PREDICATE, a function that
@@ -251,16 +251,12 @@
 
    The list of matching elements is returned.
   "
-  (let
-    ((found nil)
-     (p     predicate))
-
-    (dyn-ring-traverse ring-struct
-      (lambda ( element )
-        (when (funcall p element)
-          (push element found))))
-
-      found))
+  (let ((found nil))
+    (dyn-ring-traverse ring
+                       (lambda (element)
+                         (when (funcall predicate element)
+                           (push element found))))
+    found))
 
 ;;
 ;; ring modification functions.
