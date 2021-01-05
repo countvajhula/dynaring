@@ -127,8 +127,8 @@
    "
   (aref segment dyn-ring-value))
 
-(defun dyn-ring-set-segment-value (segment value)
-  "dyn-ring-set-segment-value SEGMENT VALUE
+(defun dyn-ring-segment-set-value (segment value)
+  "dyn-ring-segment-set-value SEGMENT VALUE
 
    Set the value of SEGMENT to VALUE.
   "

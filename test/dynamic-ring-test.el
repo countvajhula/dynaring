@@ -101,9 +101,9 @@
              (dyn-ring-segment-value
               (dyn-ring-make-segment 1))))
 
-  ;; dyn-ring-set-segment-value
+  ;; dyn-ring-segment-set-value
   (let ((segment (dyn-ring-make-segment 1)))
-    (dyn-ring-set-segment-value segment 2)
+    (dyn-ring-segment-set-value segment 2)
     (should (= 2
                (dyn-ring-segment-value segment))))
 
