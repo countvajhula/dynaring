@@ -347,10 +347,17 @@
   ;; 1-element ring
   (let* ((ring (make-dyn-ring))
          (segment (dyn-ring-insert ring 1)))
-    ;; (should (dyn-ring-rotate-until ring
-    ;;                                #'dyn-ring-rotate-left
-    ;;                                (lambda (element)
-    ;;                                  t)))
+    (should (dyn-ring-rotate-until ring
+                                   #'dyn-ring-rotate-left
+                                   (lambda (element)
+                                     t)))
+    (should (eq segment (dyn-ring-head ring))))
+  (let* ((ring (make-dyn-ring))
+         (segment (dyn-ring-insert ring 1)))
+    (should-not (dyn-ring-rotate-until ring
+                                       #'dyn-ring-rotate-left
+                                       (lambda (element)
+                                         nil)))
     (should (eq segment (dyn-ring-head ring))))
 
   ;; 2-element ring

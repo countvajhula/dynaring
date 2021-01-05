@@ -211,7 +211,7 @@
 ;; - dyn-ring-transform-filter
 ;; - dyn-ring-values
 
-(defun dyn-ring-rotate-until ( ring-struct direction fn )
+(defun dyn-ring-rotate-until (ring direction fn)
   "dyn-ring-rotate-until RING DIRECTION FN
 
    Rotate the head of RING in DIRECTION which is one of two
@@ -224,22 +224,23 @@
    the head element it started with.
   "
   (let
-    ((start (car ring-struct)))
+    ((start (dyn-ring-head ring)))
 
     (catch 'stop
 
       (when start
-        (when (< (dyn-ring-size ring-struct) 2) (throw 'stop nil))
+        (when (= (dyn-ring-size ring) 1)
+          (if (funcall fn (dyn-ring-value ring))
+              (throw 'stop t)
+            (throw 'stop nil)))
 
-        (funcall direction ring-struct)
+        (funcall direction ring)
 
         ;; when we have moved off the start loop until we return to it.
-        (while (not (eq (car ring-struct) start))
-          (when (funcall fn (dyn-ring-value ring-struct)) (throw 'stop t))
-          (funcall direction ring-struct))
-
-        ;; if nothing is found reset the head back to the original value
-        (setcar ring-struct start)
+        (while (not (eq (dyn-ring-head ring) start))
+          (when (funcall fn (dyn-ring-value ring))
+            (throw 'stop t))
+          (funcall direction ring))
         nil)) ))
 
 (defun dyn-ring-find ( ring-struct predicate )
