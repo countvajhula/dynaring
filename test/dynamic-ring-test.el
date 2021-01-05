@@ -336,3 +336,96 @@
     (should (null (dyn-ring-segment-previous seg3)))
     (should (null (dyn-ring-segment-next seg3)))))
 
+(ert-deftest dyn-ring-rotate-until-test ()
+  ;; empty ring
+  (let ((ring (make-dyn-ring)))
+    (should-not (dyn-ring-rotate-until ring
+                                       #'dyn-ring-rotate-left
+                                       (lambda (element)
+                                         t))))
+
+  ;; 1-element ring
+  (let* ((ring (make-dyn-ring))
+         (segment (dyn-ring-insert ring 1)))
+    ;; (should (dyn-ring-rotate-until ring
+    ;;                                #'dyn-ring-rotate-left
+    ;;                                (lambda (element)
+    ;;                                  t)))
+    (should (eq segment (dyn-ring-head ring))))
+
+  ;; 2-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
+    (should (dyn-ring-rotate-until ring
+                                   #'dyn-ring-rotate-left
+                                   (lambda (element)
+                                     t)))
+    (should (eq seg1 (dyn-ring-head ring))))
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2)))
+    (should (dyn-ring-rotate-until ring
+                                   #'dyn-ring-rotate-right
+                                   (lambda (element)
+                                     t)))
+    (should (eq seg1 (dyn-ring-head ring))))
+
+  ;; 3-element ring
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should (dyn-ring-rotate-until ring
+                                   #'dyn-ring-rotate-left
+                                   (lambda (element)
+                                     t)))
+    (should (eq seg1 (dyn-ring-head ring))))
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should (dyn-ring-rotate-until ring
+                                   #'dyn-ring-rotate-right
+                                   (lambda (element)
+                                     t)))
+    (should (eq seg2 (dyn-ring-head ring))))
+  ;; non-trivial predicate
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should (dyn-ring-rotate-until ring
+                                   #'dyn-ring-rotate-left
+                                   (lambda (element)
+                                     (= element 2))))
+    (should (eq seg2 (dyn-ring-head ring))))
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should (dyn-ring-rotate-until ring
+                                   #'dyn-ring-rotate-right
+                                   (lambda (element)
+                                     (= element 2))))
+    (should (eq seg2 (dyn-ring-head ring))))
+  ;; predicate never satisfied
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should-not (dyn-ring-rotate-until ring
+                                       #'dyn-ring-rotate-left
+                                       (lambda (element)
+                                         nil)))
+    (should (eq seg3 (dyn-ring-head ring))))
+  (let* ((ring (make-dyn-ring))
+         (seg1 (dyn-ring-insert ring 1))
+         (seg2 (dyn-ring-insert ring 2))
+         (seg3 (dyn-ring-insert ring 3)))
+    (should-not (dyn-ring-rotate-until ring
+                                       #'dyn-ring-rotate-right
+                                       (lambda (element)
+                                         nil)))
+    (should (eq seg3 (dyn-ring-head ring)))))
+
