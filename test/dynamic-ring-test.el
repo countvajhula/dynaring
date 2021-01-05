@@ -16,6 +16,14 @@
 (require 'dynamic-ring)
 (require 'cl)
 
+(defun segments-are-linked-p (previous next)
+  (and (eq (dyn-ring-segment-next previous) next)
+       (eq (dyn-ring-segment-previous next) previous)))
+
+(defun segment-is-free-p (segment)
+  (and (null (dyn-ring-segment-next segment))
+       (null (dyn-ring-segment-previous segment))))
+
 (ert-deftest dyn-ring-test ()
   ;; null constructor
   (should (make-dyn-ring))
@@ -144,8 +152,7 @@
     (should (dyn-ring-insert ring 1))
     (should (= 1 (dyn-ring-value ring)))
     (let ((head (dyn-ring-head ring)))
-      (should (eq head (dyn-ring-segment-previous head)))
-      (should (eq head (dyn-ring-segment-next head)))))
+      (should (segments-are-linked-p head head))))
 
   ;; one-element ring
   (let* ((ring (make-dyn-ring))
@@ -153,14 +160,8 @@
     (let ((new (dyn-ring-insert ring 2)))
       (should new)
       (should (= 2 (dyn-ring-value ring)))
-      (should (eq (dyn-ring-segment-previous new)
-                  elem1))
-      (should (eq (dyn-ring-segment-next new)
-                  elem1))
-      (should (eq (dyn-ring-segment-previous elem1)
-                  new))
-      (should (eq (dyn-ring-segment-next elem1)
-                  new))))
+      (should (segments-are-linked-p elem1 new))
+      (should (segments-are-linked-p new elem1))))
 
   ;; two-element ring
   (let* ((ring (make-dyn-ring))
@@ -169,18 +170,9 @@
     (let ((new (dyn-ring-insert ring 3)))
       (should new)
       (should (= 3 (dyn-ring-value ring)))
-      (should (eq (dyn-ring-segment-previous new)
-                  elem1))
-      (should (eq (dyn-ring-segment-next new)
-                  elem2))
-      (should (eq (dyn-ring-segment-previous elem1)
-                  elem2))
-      (should (eq (dyn-ring-segment-next elem1)
-                  new))
-      (should (eq (dyn-ring-segment-previous elem2)
-                  new))
-      (should (eq (dyn-ring-segment-next elem2)
-                  elem1)))))
+      (should (segments-are-linked-p elem1 new))
+      (should (segments-are-linked-p new elem2))
+      (should (segments-are-linked-p elem2 elem1)))))
 
 (ert-deftest dyn-ring-rotate-test ()
   ;; empty ring
@@ -236,8 +228,7 @@
     (should (dyn-ring-delete ring seg2))
     (should (= 1 (dyn-ring-size ring)))
     (should (eq seg1 (dyn-ring-head ring)))
-    (should (eq (dyn-ring-segment-next seg1) seg1))
-    (should (eq (dyn-ring-segment-previous seg1) seg1)))
+    (should (segments-are-linked-p seg1 seg1)))
   (let* ((ring (make-dyn-ring))
          (seg1 (dyn-ring-insert ring 1))
          (seg2 (dyn-ring-insert ring 2)))
@@ -245,8 +236,7 @@
     (should (dyn-ring-delete ring seg1))
     (should (= 1 (dyn-ring-size ring)))
     (should (eq seg2 (dyn-ring-head ring)))
-    (should (eq (dyn-ring-segment-next seg2) seg2))
-    (should (eq (dyn-ring-segment-previous seg2) seg2)))
+    (should (segments-are-linked-p seg2 seg2)))
 
   ;; 3-element ring
   (let* ((ring (make-dyn-ring))
@@ -257,10 +247,8 @@
     (should (dyn-ring-delete ring seg3))
     (should (= 2 (dyn-ring-size ring)))
     (should (eq seg2 (dyn-ring-head ring)))
-    (should (eq (dyn-ring-segment-next seg2) seg1))
-    (should (eq (dyn-ring-segment-previous seg2) seg1))
-    (should (eq (dyn-ring-segment-next seg1) seg2))
-    (should (eq (dyn-ring-segment-previous seg1) seg2)))
+    (should (segments-are-linked-p seg2 seg1))
+    (should (segments-are-linked-p seg1 seg2)))
   (let* ((ring (make-dyn-ring))
          (seg1 (dyn-ring-insert ring 1))
          (seg2 (dyn-ring-insert ring 2))
@@ -269,10 +257,8 @@
     (should (dyn-ring-delete ring seg2))
     (should (= 2 (dyn-ring-size ring)))
     (should (eq seg3 (dyn-ring-head ring)))
-    (should (eq (dyn-ring-segment-next seg3) seg1))
-    (should (eq (dyn-ring-segment-previous seg3) seg1))
-    (should (eq (dyn-ring-segment-next seg1) seg3))
-    (should (eq (dyn-ring-segment-previous seg1) seg3)))
+    (should (segments-are-linked-p seg3 seg1))
+    (should (segments-are-linked-p seg1 seg3)))
   (let* ((ring (make-dyn-ring))
          (seg1 (dyn-ring-insert ring 1))
          (seg2 (dyn-ring-insert ring 2))
@@ -281,10 +267,8 @@
     (should (dyn-ring-delete ring seg1))
     (should (= 2 (dyn-ring-size ring)))
     (should (eq seg3 (dyn-ring-head ring)))
-    (should (eq (dyn-ring-segment-next seg3) seg2))
-    (should (eq (dyn-ring-segment-previous seg3) seg2))
-    (should (eq (dyn-ring-segment-next seg2) seg3))
-    (should (eq (dyn-ring-segment-previous seg2) seg3))))
+    (should (segments-are-linked-p seg3 seg2))
+    (should (segments-are-linked-p seg2 seg3))))
 
 (ert-deftest dyn-ring-destroy-test ()
   ;; empty ring
@@ -297,8 +281,7 @@
     (should (dyn-ring-destroy ring))
     (should (null (dyn-ring-head ring)))
     (should (= 0 (dyn-ring-size ring)))
-    (should (null (dyn-ring-segment-previous segment)))
-    (should (null (dyn-ring-segment-next segment))))
+    (should (segment-is-free-p segment)))
 
   ;; 2-element ring
   (let* ((ring (make-dyn-ring))
@@ -307,10 +290,8 @@
     (should (dyn-ring-destroy ring))
     (should (null (dyn-ring-head ring)))
     (should (= 0 (dyn-ring-size ring)))
-    (should (null (dyn-ring-segment-previous seg1)))
-    (should (null (dyn-ring-segment-next seg1)))
-    (should (null (dyn-ring-segment-previous seg2)))
-    (should (null (dyn-ring-segment-next seg2))))
+    (should (segment-is-free-p seg1))
+    (should (segment-is-free-p seg2)))
 
   ;; 3-element ring
   (let* ((ring (make-dyn-ring))
@@ -320,12 +301,9 @@
     (should (dyn-ring-destroy ring))
     (should (null (dyn-ring-head ring)))
     (should (= 0 (dyn-ring-size ring)))
-    (should (null (dyn-ring-segment-previous seg1)))
-    (should (null (dyn-ring-segment-next seg1)))
-    (should (null (dyn-ring-segment-previous seg2)))
-    (should (null (dyn-ring-segment-next seg2)))
-    (should (null (dyn-ring-segment-previous seg3)))
-    (should (null (dyn-ring-segment-next seg3)))))
+    (should (segment-is-free-p seg1))
+    (should (segment-is-free-p seg2))
+    (should (segment-is-free-p seg3))))
 
 (ert-deftest dyn-ring-rotate-until-test ()
   ;; empty ring
