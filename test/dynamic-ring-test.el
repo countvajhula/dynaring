@@ -592,3 +592,46 @@
    (lambda ()
      (should (dyn-ring-transform-map ring #'1+))
      (should (equal (list 2 3 4) (dyn-ring-values ring))))))
+
+(ert-deftest dyn-ring-filter-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring #'oddp)))
+       (should (dyn-ring-equal-p result ring)))))
+
+  ;; one-element ring
+  (fixture-1-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring #'oddp)))
+       (should (dyn-ring-equal-p result ring)))))
+  (fixture-1-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring #'evenp)))
+       (should (dyn-ring-empty-p result)))))
+
+  ;; two-element ring
+  (fixture-2-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring #'oddp)))
+       (should (equal (list 1) (dyn-ring-values result))))))
+  (fixture-2-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring #'evenp)))
+       (should (equal (list 2) (dyn-ring-values result))))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring #'oddp)))
+       (should (equal (list 1 3) (dyn-ring-values result))))))
+  ;; filter out all
+  (fixture-3-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring (lambda (elem) nil))))
+       (should (dyn-ring-empty-p result)))))
+  ;; filter out none
+  (fixture-3-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring (lambda (elem) t))))
+       (should (dyn-ring-equal-p result ring))))))

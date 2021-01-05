@@ -90,7 +90,8 @@
       (dyn-ring-segment-value head))))
 
 (defun dyn-ring-equal-p (r1 r2)
-  "Check if two rings are equal in their values and structure."
+  "Check if two rings are equal in their values, structure,
+and orientation."
   (equal (dyn-ring-values r1)
          (dyn-ring-values r2)))
 
@@ -208,7 +209,10 @@
   "dyn-ring-map RING FN
 
    Walk the elements of RING passing each element to FN, creating
-   a new ring containing the transformed elements.
+   a new ring containing the transformed elements. This does not
+   modify the original RING.
+
+   dyn-ring-transform-map is a mutating version of this interface.
   "
   (let ((new-ring (make-dyn-ring)))
     (if (dyn-ring-empty-p ring)
@@ -224,11 +228,42 @@
           (dyn-ring-set-head new-ring new-head)
           new-ring)))))
 
+(defun dyn-ring-filter (ring predicate)
+  "dyn-ring-filter RING PREDICATE
+
+   Walk the elements of RING passing each element to PREDICATE,
+   creating a new ring containing those elements for which
+   PREDICATE returns a non-nil result. This does not modify the
+   original RING.
+  "
+  (let ((new-ring (make-dyn-ring)))
+    (if (dyn-ring-empty-p ring)
+        new-ring
+      (let* ((head (dyn-ring-head ring))
+             (head-value (dyn-ring-segment-value head))
+             (new-head nil))
+        (when (funcall predicate head-value)
+          (setq new-head (dyn-ring-insert new-ring head-value)))
+        (let* ((current (dyn-ring-segment-previous head))
+               (current-value (dyn-ring-segment-value current)))
+          (while (not (eq current head))
+            (when (funcall predicate current-value)
+              (let ((segment (dyn-ring-insert new-ring current-value)))
+                (unless new-head
+                  (setq new-head segment))))
+            (setq current (dyn-ring-segment-previous current))
+            (setq current-value (dyn-ring-segment-value current))))
+        (dyn-ring-set-head new-ring new-head)
+        new-ring))))
+
 (defun dyn-ring-transform-map (ring fn)
   "dyn-ring-map RING FN
 
    Transform the RING by mapping each of its elements under FN.
    This mutates the existing ring.
+
+   dyn-ring-map is a functional (non-mutating) version of this
+   interface.
   "
   (unless (dyn-ring-empty-p ring)
     (let ((head (dyn-ring-head ring)))
