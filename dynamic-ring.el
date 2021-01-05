@@ -341,75 +341,48 @@
     ;; return the newly inserted segment.
     segment))
 
-(defun dyn-ring-link-left-to-right ( left right )
-  "dyn-ring-link-left-to-right.
+(defun dyn-ring--unlink-segment (segment)
+  "dyn-ring--unlink-segment SEGMENT
 
-   - INTERNAL -
-
-   Link elements LEFT and RIGHT to each other.  This is used for
-   deleting elements from a ring.
-  "
-  (setcdr (aref left  dyn-ring-linkage) right)
-  (setcar (aref right dyn-ring-linkage) left))
-
-(defun dyn-ring-unlink-element ( element )
-  "dyn-ring-unlink-element
-
-   - INTENRAL -
-
-   Unlink ELEMENT. by relinking it's left and right elements to
+   Unlink SEGMENT by relinking its left and right segments to
    each other.
   "
-  (let
-    ((linkage (aref element dyn-ring-linkage)))
+  (dyn-ring--link (dyn-ring-segment-previous segment)
+                  (dyn-ring-segment-next segment)))
 
-    (dyn-ring-link-left-to-right (car linkage) (cdr linkage))
-    (cdr linkage) ))
+(defun dyn-ring--free-segment (segment)
+  "dyn-ring--free-segment SEGMENT
 
-(defun dyn-ring-delete ( ring-struct element )
-  "dyn-ring-delete RING ELEMENT
+   Nullify links in SEGMENT. This is an extra precaution
+to make sure that the garbage collector reclaims it (e.g.
+if the segment happens to point to itself).
+  "
+  (dyn-ring-segment-set-next segment nil)
+  (dyn-ring-segment-set-previous segment nil))
 
-   Delete ELEMENT from RING.
+(defun dyn-ring-delete (ring segment)
+  "dyn-ring-delete RING SEGMENT
+
+   Delete SEGMENT from RING.
   "
   (let
-    ((ring-size (dyn-ring-size ring-struct)))
+    ((ring-size (dyn-ring-size ring)))
 
-    (cond
-      ((equal 0 ring-size) nil)
-      ((equal 1 ring-size)
-        ;; when there is only one element we ignore element and simply
-        ;; delete the head and reset the size.
-        (progn
-          (setcar ring-struct nil)
-          (setcdr ring-struct 0)
-          t))
-      ((equal 2 ring-size)
-        ;; if there are two elements nullify the other element's links
-        ;; and reset both head and the size.
-        (progn
-          (let*
-            ((other   (car  (aref element dyn-ring-linkage)))
-             (linkage (aref other dyn-ring-linkage)))
+    (when (> ring-size 0)
+      (cond
+       ((equal 1 ring-size)
+        (dyn-ring--free-segment (dyn-ring-head ring))
+        (dyn-ring-set-head ring nil))
+       (t
+        (dyn-ring--unlink-segment segment)
 
-            (setcar linkage nil)
-            (setcdr linkage nil)
-
-            (setcar ring-struct other)
-            (setcdr ring-struct 1) )
-          t))
-
-      ;; for three or more elements perform a unlink.
-      (t
-        (let
-          ((right (dyn-ring-unlink-element element)))
-
-          ;; if we deleted the head element set the
-          ;; head to the right element.
-          (when (eq (car ring-struct) element)
-            (setcar ring-struct right))
-
-          (setcdr ring-struct (- (cdr ring-struct) 1))
-          t)) )))
+        ;; if we deleted the head element set the
+        ;; head to the right element.
+        (when (eq (dyn-ring-head ring) segment)
+          (dyn-ring-set-head ring (dyn-ring-segment-next segment)))
+        (dyn-ring--free-segment segment)))
+      (dyn-ring-set-size ring (1- (dyn-ring-size ring)))
+      t)))
 
 (defun dyn-ring-rotate-left (ring)
   "dyn-ring-rotate-left RING
