@@ -275,20 +275,18 @@
     (let
         ((current (dyn-ring-head ring)))
 
-      (when (dyn-ring-segment-next current)
-        ;; There is more than one element. Break the ring by
-        ;; terminating the previous element
-        (dyn-ring--free-segment (dyn-ring-segment-previous current))
+      ;; Break the ring by terminating the previous element
+      (dyn-ring--free-segment (dyn-ring-segment-previous current))
 
-        (while (dyn-ring-segment-next current)
-          (let
-              ((next (dyn-ring-segment-next current)))
+      (while (dyn-ring-segment-next current)
+        (let
+            ((next (dyn-ring-segment-next current)))
 
-            ;; delete all the links in the current element
-            (dyn-ring--free-segment current)
+          ;; delete all the links in the current element
+          (dyn-ring--free-segment current)
 
-            ;; move to the right
-            (setq current next))))
+          ;; move to the right
+          (setq current next)))
       ;; delete the head pointer.
       (dyn-ring-set-head ring nil)
       (dyn-ring-set-size ring 0)
@@ -309,12 +307,10 @@
         (ring-size (dyn-ring-size ring))
         (head (dyn-ring-head ring)))
     (cond
-     ;; zero is a simple insert
-     ((equal 1 ring-size)
-      (dyn-ring--link segment head)
-      (dyn-ring--link head segment))
+     ((equal 0 ring-size)
+      (dyn-ring--link segment segment))
 
-     ((> ring-size 1)
+     (t
       (let ((previous (dyn-ring-segment-previous head)))
         (dyn-ring--link previous segment)
         (dyn-ring--link segment head))))
