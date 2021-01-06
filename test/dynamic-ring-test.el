@@ -635,3 +635,47 @@
    (lambda ()
      (let ((result (dyn-ring-filter ring (lambda (elem) t))))
        (should (dyn-ring-equal-p result ring))))))
+
+(ert-deftest dyn-ring-transform-filter-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (should-not (dyn-ring-transform-filter ring #'oddp))))
+
+  ;; one-element ring
+  (fixture-1-ring
+   (lambda ()
+     (should (dyn-ring-transform-filter ring #'oddp))
+     (should (= 1 (dyn-ring-value ring)))
+     (should (= 1 (dyn-ring-size ring)))))
+  (fixture-1-ring
+   (lambda ()
+     (should (dyn-ring-transform-filter ring #'evenp))
+     (should (dyn-ring-empty-p ring))))
+
+  ;; two-element ring
+  (fixture-2-ring
+   (lambda ()
+     (should (dyn-ring-transform-filter ring #'oddp))
+     (should (equal (list 1) (dyn-ring-values ring)))))
+  (fixture-2-ring
+   (lambda ()
+     (should (dyn-ring-transform-filter ring #'evenp))
+     (should (equal (list 2) (dyn-ring-values ring)))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (should (dyn-ring-transform-filter ring #'oddp))
+     (should (equal (list 1 3) (dyn-ring-values ring)))))
+  ;; filter out all
+  (fixture-3-ring
+   (lambda ()
+     (should (dyn-ring-transform-filter ring (lambda (elem) nil)))
+     (should (dyn-ring-empty-p ring))))
+  ;; filter out none
+  (fixture-3-ring
+   (lambda ()
+     (let ((ring-copy (dyn-ring-map ring #'identity)))
+       (should (dyn-ring-transform-filter ring (lambda (elem) t)))
+       (should (dyn-ring-equal-p ring ring-copy))))))

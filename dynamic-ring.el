@@ -235,6 +235,8 @@ and orientation."
    creating a new ring containing those elements for which
    PREDICATE returns a non-nil result. This does not modify the
    original RING.
+
+   dyn-ring-transform-filter is a mutating version of this interface.
   "
   (let ((new-ring (make-dyn-ring)))
     (if (dyn-ring-empty-p ring)
@@ -255,6 +257,35 @@ and orientation."
             (setq current-value (dyn-ring-segment-value current))))
         (dyn-ring-set-head new-ring new-head)
         new-ring))))
+
+(defun dyn-ring-transform-filter (ring predicate)
+  "dyn-ring-filter RING PREDICATE
+
+   Transform RING by passing each element to PREDICATE,
+   retaining only those elements for which
+   PREDICATE returns a non-nil result. This mutates the
+   existing RING.
+
+   dyn-ring-filter is a functional (non-mutating) version of this
+   interface.
+  "
+  (unless (dyn-ring-empty-p ring)
+    (let* ((head (dyn-ring-head ring))
+           (current (dyn-ring-segment-previous head))
+           (current-value (dyn-ring-segment-value current)))
+      (while (not (eq head current))
+        ;; go the other way around the ring so that the head
+        ;; is the last segment encountered, to avoid having to
+        ;; keep track of a potentially changing head
+        (let ((previous (dyn-ring-segment-previous current)))
+          (unless (funcall predicate current-value)
+            (dyn-ring-delete ring current))
+          (setq current previous)
+          (setq current-value (dyn-ring-segment-value current))))
+      ;; check the head
+      (unless (funcall predicate current-value)
+        (dyn-ring-delete ring current))
+      t)))
 
 (defun dyn-ring-transform-map (ring fn)
   "dyn-ring-map RING FN
