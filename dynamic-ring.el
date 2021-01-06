@@ -258,6 +258,27 @@ and orientation."
             (dyn-ring-set-head new-ring new-head)))
         new-ring))))
 
+(defun dyn-ring-transform-map (ring fn)
+  "dyn-ring-map RING FN
+
+   Transform the RING by mapping each of its elements under FN.
+   This mutates the existing ring.
+
+   dyn-ring-map is a functional (non-mutating) version of this
+   interface.
+  "
+  (unless (dyn-ring-empty-p ring)
+    (let ((head (dyn-ring-head ring)))
+      (dyn-ring-segment-set-value head
+                                  (funcall fn (dyn-ring-segment-value head)))
+      (let ((current (dyn-ring-segment-previous head)))
+        (while (not (eq current head))
+          (dyn-ring-segment-set-value current
+                                      (funcall fn (dyn-ring-segment-value current)))
+          (setq current (dyn-ring-segment-previous current))))
+      (dyn-ring-set-head ring head)
+      t)))
+
 (defun dyn-ring-transform-filter (ring predicate)
   "dyn-ring-filter RING PREDICATE
 
@@ -286,40 +307,6 @@ and orientation."
       (unless (funcall predicate current-value)
         (dyn-ring-delete ring current))
       t)))
-
-(defun dyn-ring-transform-map (ring fn)
-  "dyn-ring-map RING FN
-
-   Transform the RING by mapping each of its elements under FN.
-   This mutates the existing ring.
-
-   dyn-ring-map is a functional (non-mutating) version of this
-   interface.
-  "
-  (unless (dyn-ring-empty-p ring)
-    (let ((head (dyn-ring-head ring)))
-      (dyn-ring-segment-set-value head
-                                  (funcall fn (dyn-ring-segment-value head)))
-      (let ((current (dyn-ring-segment-previous head)))
-        (while (not (eq current head))
-          (dyn-ring-segment-set-value current
-                                      (funcall fn (dyn-ring-segment-value current)))
-          (setq current (dyn-ring-segment-previous current))))
-      (dyn-ring-set-head ring head)
-      t)))
-
-
-;; TODO:
-;; (1) map should return a new ring with the elements mapped
-;; (2) there should also be a mutating version that modifies the
-;;     existing ring under the map (maybe \"transform\")
-;; (3) and a function dyn-ring-values that returns a flat list of
-;;     values containined in the ring
-;; - dyn-ring-map
-;; - dyn-ring-filter
-;; - dyn-ring-transform-map
-;; - dyn-ring-transform-filter
-;; - dyn-ring-values
 
 (defun dyn-ring-rotate-until (ring direction fn)
   "dyn-ring-rotate-until RING DIRECTION FN
