@@ -625,15 +625,33 @@
    (lambda ()
      (let ((result (dyn-ring-filter ring #'oddp)))
        (should (equal (list 1 3) (dyn-ring-values result))))))
+
   ;; filter out all
   (fixture-3-ring
    (lambda ()
      (let ((result (dyn-ring-filter ring (lambda (elem) nil))))
        (should (dyn-ring-empty-p result)))))
+
   ;; filter out none
   (fixture-3-ring
    (lambda ()
      (let ((result (dyn-ring-filter ring (lambda (elem) t))))
+       (should (dyn-ring-equal-p result ring)))))
+
+  ;; filter should behave the same as deletion
+  (fixture-3-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring
+                                    (lambda (elem)
+                                      (not (= elem 1))))))
+       (dyn-ring-delete ring seg1)
+       (should (dyn-ring-equal-p result ring)))))
+  (fixture-3-ring
+   (lambda ()
+     (let ((result (dyn-ring-filter ring
+                                    (lambda (elem)
+                                      (not (= elem 2))))))
+       (dyn-ring-delete ring seg2)
        (should (dyn-ring-equal-p result ring))))))
 
 (ert-deftest dyn-ring-transform-filter-test ()
@@ -668,14 +686,34 @@
    (lambda ()
      (should (dyn-ring-transform-filter ring #'oddp))
      (should (equal (list 1 3) (dyn-ring-values ring)))))
+
   ;; filter out all
   (fixture-3-ring
    (lambda ()
      (should (dyn-ring-transform-filter ring (lambda (elem) nil)))
      (should (dyn-ring-empty-p ring))))
+
   ;; filter out none
   (fixture-3-ring
    (lambda ()
      (let ((ring-copy (dyn-ring-map ring #'identity)))
        (should (dyn-ring-transform-filter ring (lambda (elem) t)))
+       (should (dyn-ring-equal-p ring ring-copy)))))
+
+  ;; filter should behave the same as deletion
+  (fixture-3-ring
+   (lambda ()
+     (let ((ring-copy (dyn-ring-map ring #'identity)))
+       (dyn-ring-transform-filter ring-copy
+                                  (lambda (elem)
+                                    (not (= elem 1))))
+       (dyn-ring-delete ring seg1)
+       (should (dyn-ring-equal-p ring ring-copy)))))
+  (fixture-3-ring
+   (lambda ()
+     (let ((ring-copy (dyn-ring-map ring #'identity)))
+       (dyn-ring-transform-filter ring-copy
+                                  (lambda (elem)
+                                    (not (= elem 2))))
+       (dyn-ring-delete ring seg2)
        (should (dyn-ring-equal-p ring ring-copy))))))
