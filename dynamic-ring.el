@@ -242,20 +242,20 @@ and orientation."
     (if (dyn-ring-empty-p ring)
         new-ring
       (let* ((head (dyn-ring-head ring))
-             (head-value (dyn-ring-segment-value head))
-             (new-head nil))
-        (when (funcall predicate head-value)
-          (setq new-head (dyn-ring-insert new-ring head-value)))
-        (let* ((current (dyn-ring-segment-previous head))
-               (current-value (dyn-ring-segment-value current)))
-          (while (not (eq current head))
-            (when (funcall predicate current-value)
-              (let ((segment (dyn-ring-insert new-ring current-value)))
-                (unless new-head
-                  (setq new-head segment))))
-            (setq current (dyn-ring-segment-previous current))
-            (setq current-value (dyn-ring-segment-value current))))
-        (dyn-ring-set-head new-ring new-head)
+             (current (dyn-ring-segment-previous head))
+             (current-value (dyn-ring-segment-value current)))
+        (while (not (eq current head))
+          ;; go the other way around the ring so that the head
+          ;; is the last segment encountered, to avoid having to
+          ;; keep track of a potentially changing head
+          (when (funcall predicate current-value)
+            (dyn-ring-insert new-ring current-value))
+          (setq current (dyn-ring-segment-previous current))
+          (setq current-value (dyn-ring-segment-value current)))
+        ;; check the head
+        (when (funcall predicate current-value)
+          (let ((new-head (dyn-ring-insert new-ring current-value)))
+            (dyn-ring-set-head new-ring new-head)))
         new-ring))))
 
 (defun dyn-ring-transform-filter (ring predicate)
