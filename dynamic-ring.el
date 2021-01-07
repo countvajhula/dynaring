@@ -533,6 +533,23 @@ if the segment happens to point to itself).
                        (dyn-ring-segment-next
                         (dyn-ring-head ring)))))
 
+(defun dyn-ring-break-insert (ring element)
+  "dyn-ring-break-insert RING ELEMENT
+
+   Add ELEMENT to the RING. This performs a simple insertion if the
+   element isn't already in the ring. In the case where the element is
+   already in the ring, the element is removed from its original
+   location and re-inserted at the head.  Essentially, the ring is
+   \"broken\" and \"recast\" to place the element at the head. This can
+   be used to model \"recency.\"
+  "
+  (let ((segment (dyn-ring-find-forwards ring
+                                         (lambda (elem)
+                                           (eq element elem)))))
+    (when segment
+      (dyn-ring-delete ring segment))
+    (dyn-ring-insert ring element)))
+
 (defun dyn-ring-values (ring)
   "dyn-ring-values RING
 

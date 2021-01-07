@@ -257,6 +257,77 @@
        (should (segments-are-linked-p new seg2))
        (should (segments-are-linked-p seg2 seg1))))))
 
+(ert-deftest dyn-ring-break-insert-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (should (dyn-ring-break-insert ring 1))
+     (should (= 1 (dyn-ring-value ring)))
+     (let ((head (dyn-ring-head ring)))
+       (should (segments-are-linked-p head head)))))
+
+  ;; one-element ring
+  (fixture-1-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 2)))
+       (should new)
+       (should (= 2 (dyn-ring-value ring)))
+       (should (segments-are-linked-p segment new))
+       (should (segments-are-linked-p new segment)))))
+  (fixture-1-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 1)))
+       (should new)
+       (should (= 1 (dyn-ring-value ring)))
+       (should (= 1 (dyn-ring-size ring))))))
+
+  ;; two-element ring
+  (fixture-2-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 3)))
+       (should new)
+       (should (= 3 (dyn-ring-value ring)))
+       (should (segments-are-linked-p seg1 new))
+       (should (segments-are-linked-p new seg2))
+       (should (segments-are-linked-p seg2 seg1)))))
+  (fixture-2-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 2)))
+       (should new)
+       (should (= 2 (dyn-ring-value ring)))
+       (should (segments-are-linked-p seg1 new))
+       (should (segments-are-linked-p new seg1)))))
+  (fixture-2-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 1)))
+       (should new)
+       (should (= 1 (dyn-ring-value ring)))
+       (should (segments-are-linked-p seg2 new))
+       (should (segments-are-linked-p new seg2)))))
+
+  ;; two-element ring
+  (fixture-3-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 3)))
+       (should new)
+       (should (= 3 (dyn-ring-value ring)))
+       (should (segments-are-linked-p seg1 new))
+       (should (segments-are-linked-p new seg2)))))
+  (fixture-3-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 2)))
+       (should new)
+       (should (= 2 (dyn-ring-value ring)))
+       (should (segments-are-linked-p seg1 new))
+       (should (segments-are-linked-p new seg3)))))
+  (fixture-3-ring
+   (lambda ()
+     (let ((new (dyn-ring-break-insert ring 1)))
+       (should new)
+       (should (= 1 (dyn-ring-value ring)))
+       (should (segments-are-linked-p seg2 new))
+       (should (segments-are-linked-p new seg3))))))
+
 (ert-deftest dyn-ring-rotate-test ()
   ;; empty ring
   (fixture-0-ring
