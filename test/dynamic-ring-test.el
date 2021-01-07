@@ -515,6 +515,112 @@
                                 (lambda (element)
                                   nil))))))
 
+(ert-deftest dyn-ring-find-forwards-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (should-not (dyn-ring-find-forwards ring
+                                         (lambda (element)
+                                           t)))))
+
+  ;; 1-element ring
+  (fixture-1-ring
+   (lambda ()
+     (should (eq segment
+                 (dyn-ring-find-forwards ring
+                                         (lambda (element)
+                                           (= 1 element)))))
+     (should-not (dyn-ring-find-forwards ring
+                                         (lambda (element)
+                                           nil)))))
+
+  ;; 2-element ring
+  (fixture-2-ring
+   (lambda ()
+     (should (eq seg1
+                 (dyn-ring-find-forwards ring
+                                         (lambda (element)
+                                           (= 1 element)))))
+     (should (eq seg2 (dyn-ring-find-forwards ring
+                                              (lambda (element)
+                                                (< element 3)))))
+     (should (eq seg1 (dyn-ring-find-forwards ring
+                                              (lambda (element)
+                                                (< element 2)))))
+     (should-not (dyn-ring-find-forwards ring
+                                         (lambda (element)
+                                           nil)))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (should (eq seg1
+                 (dyn-ring-find-forwards ring
+                                         (lambda (element)
+                                           (= 1 element)))))
+     (should (eq seg3 (dyn-ring-find-forwards ring
+                                              (lambda (element)
+                                                (< element 4)))))
+     (should (eq seg2 (dyn-ring-find-forwards ring
+                                              (lambda (element)
+                                                (< element 3)))))
+     (should-not (dyn-ring-find-forwards ring
+                                         (lambda (element)
+                                           nil))))))
+
+(ert-deftest dyn-ring-find-backwards-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (should-not (dyn-ring-find-backwards ring
+                                          (lambda (element)
+                                            t)))))
+
+  ;; 1-element ring
+  (fixture-1-ring
+   (lambda ()
+     (should (eq segment
+                 (dyn-ring-find-backwards ring
+                                          (lambda (element)
+                                            (= 1 element)))))
+     (should-not (dyn-ring-find-backwards ring
+                                          (lambda (element)
+                                            nil)))))
+
+  ;; 2-element ring
+  (fixture-2-ring
+   (lambda ()
+     (should (eq seg1
+                 (dyn-ring-find-backwards ring
+                                          (lambda (element)
+                                            (= 1 element)))))
+     (should (eq seg2 (dyn-ring-find-backwards ring
+                                               (lambda (element)
+                                                 (< element 3)))))
+     (should (eq seg1 (dyn-ring-find-backwards ring
+                                               (lambda (element)
+                                                 (< element 2)))))
+     (should-not (dyn-ring-find-backwards ring
+                                          (lambda (element)
+                                            nil)))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (should (eq seg1
+                 (dyn-ring-find-backwards ring
+                                          (lambda (element)
+                                            (= 1 element)))))
+     (should (eq seg3 (dyn-ring-find-backwards ring
+                                               (lambda (element)
+                                                 (< element 4)))))
+     (should (eq seg1 (dyn-ring-find-backwards ring
+                                               (lambda (element)
+                                                 (< element 3)))))
+     (should-not (dyn-ring-find-backwards ring
+                                          (lambda (element)
+                                            nil))))))
+
 (ert-deftest dyn-ring-values-test ()
   ;; empty ring
   (fixture-0-ring

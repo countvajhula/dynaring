@@ -347,6 +347,9 @@ and orientation."
    evaluates non-nil for for the desired elements.
 
    The list of matching elements is returned.
+
+   WARNING: this interface is DEPRECATED. Favor using dyn-ring-filter
+   followed by dyn-ring-values instead.
   "
   (let ((found nil))
     (dyn-ring-traverse ring
@@ -354,6 +357,51 @@ and orientation."
                          (when (funcall predicate element)
                            (push element found))))
     found))
+
+(defun dyn-ring--find (ring predicate direction)
+  "dyn-ring--find RING PREDICATE DIRECTION
+
+   Search RING in DIRECTION for the first element that
+   matches PREDICATE. DIRECTION must be either dyn-ring-segment-next
+   (to search forward) or dyn-ring-segment-previous (to search backwards).
+
+   The ring segment containing the matching element is returned, or nil
+   if a matching element isn't found.
+  "
+  (unless (dyn-ring-empty-p ring)
+    (let* ((head (dyn-ring-head ring))
+           (current head))
+      (if (funcall predicate (dyn-ring-segment-value head))
+          head
+        (let ((current (funcall direction current)))
+          (catch 'stop
+            (while (not (eq current head))
+              (when (funcall predicate (dyn-ring-segment-value current))
+                (throw 'stop current))
+              (setq current (funcall direction current)))
+            nil))))))
+
+(defun dyn-ring-find-forwards (ring predicate)
+  "dyn-ring-find-forwards RING PREDICATE
+
+   Search RING in the forward direction for the first element that
+   matches PREDICATE.
+
+   The ring segment containing the matching element is returned, or nil
+   if a matching element isn't found.
+  "
+  (dyn-ring--find ring predicate #'dyn-ring-segment-next))
+
+(defun dyn-ring-find-backwards (ring predicate)
+  "dyn-ring-find-forward RING PREDICATE
+
+   Search RING in the backward direction for the first element that
+   matches PREDICATE.
+
+   The ring segment containing the matching element is returned, or nil
+   if a matching element isn't found.
+  "
+  (dyn-ring--find ring predicate #'dyn-ring-segment-previous))
 
 ;;
 ;; ring modification functions.
