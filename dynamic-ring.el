@@ -538,11 +538,7 @@ if the segment happens to point to itself).
 
    A list of all values contained in the RING.
   "
-  (let ((result nil))
-    (dyn-ring-traverse-collect ring
-                               (lambda (element)
-                                 (push element result)))
-    result))
+  (dyn-ring-traverse-collect ring #'identity))
 
 (provide 'dynamic-ring)
 ;;; dynamic-ring.el ends here
