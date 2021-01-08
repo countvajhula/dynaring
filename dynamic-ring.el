@@ -403,6 +403,12 @@ and orientation."
   "
   (dyn-ring--find ring predicate #'dyn-ring-segment-previous))
 
+(defun dyn-ring-contains-p (ring element)
+  "Predicate to check whether RING contains ELEMENT."
+  (dyn-ring-find-forwards ring
+                          (lambda (elem)
+                            (eq elem element))))
+
 ;;
 ;; ring modification functions.
 ;;

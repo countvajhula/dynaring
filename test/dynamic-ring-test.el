@@ -692,6 +692,33 @@
                                           (lambda (element)
                                             nil))))))
 
+(ert-deftest dyn-ring-contains-p-test ()
+  ;; empty ring
+  (fixture-0-ring
+   (lambda ()
+     (should-not (dyn-ring-contains-p ring 1))))
+
+  ;; 1-element ring
+  (fixture-1-ring
+   (lambda ()
+     (should (dyn-ring-contains-p ring 1))
+     (should-not (dyn-ring-contains-p ring 2))))
+
+  ;; 2-element ring
+  (fixture-2-ring
+   (lambda ()
+     (should (dyn-ring-contains-p ring 1))
+     (should (dyn-ring-contains-p ring 2))
+     (should-not (dyn-ring-contains-p ring 3))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     (should (dyn-ring-contains-p ring 1))
+     (should (dyn-ring-contains-p ring 2))
+     (should (dyn-ring-contains-p ring 3))
+     (should-not (dyn-ring-contains-p ring 4)))))
+
 (ert-deftest dyn-ring-values-test ()
   ;; empty ring
   (fixture-0-ring
