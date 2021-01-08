@@ -300,12 +300,12 @@ and orientation."
         ;; keep track of a potentially changing head
         (let ((previous (dyn-ring-segment-previous current)))
           (unless (funcall predicate current-value)
-            (dyn-ring-delete ring current))
+            (dyn-ring-delete-segment ring current))
           (setq current previous)
           (setq current-value (dyn-ring-segment-value current))))
       ;; check the head
       (unless (funcall predicate current-value)
-        (dyn-ring-delete ring current))
+        (dyn-ring-delete-segment ring current))
       t)))
 
 (defun dyn-ring-rotate-until (ring direction fn)
@@ -493,8 +493,8 @@ if the segment happens to point to itself).
   (dyn-ring-segment-set-next segment nil)
   (dyn-ring-segment-set-previous segment nil))
 
-(defun dyn-ring-delete (ring segment)
-  "dyn-ring-delete RING SEGMENT
+(defun dyn-ring-delete-segment (ring segment)
+  "dyn-ring-delete-segment RING SEGMENT
 
    Delete SEGMENT from RING.
   "
@@ -516,6 +516,17 @@ if the segment happens to point to itself).
         (dyn-ring--free-segment segment)))
       (dyn-ring-set-size ring (1- (dyn-ring-size ring)))
       t)))
+
+(defun dyn-ring-delete (ring element)
+  "dyn-ring-delete RING ELEMENT
+
+   Delete ELEMENT from RING.
+  "
+  (let ((segment (dyn-ring-find-forwards ring
+                                         (lambda (elem)
+                                           (eq elem element)))))
+    (when segment
+      (dyn-ring-delete-segment ring segment))))
 
 (defun dyn-ring-rotate-left (ring)
   "dyn-ring-rotate-left RING
@@ -549,12 +560,8 @@ if the segment happens to point to itself).
    \"broken\" and \"recast\" to place the element at the head. This can
    be used to model \"recency.\"
   "
-  (let ((segment (dyn-ring-find-forwards ring
-                                         (lambda (elem)
-                                           (eq element elem)))))
-    (when segment
-      (dyn-ring-delete ring segment))
-    (dyn-ring-insert ring element)))
+  (dyn-ring-delete ring element)
+  (dyn-ring-insert ring element))
 
 (defun dyn-ring-values (ring)
   "dyn-ring-values RING

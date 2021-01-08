@@ -359,31 +359,31 @@
      (should (eq seg1 (dyn-ring-rotate-right ring)))
      (should (eq seg3 (dyn-ring-rotate-right ring))))))
 
-(ert-deftest dyn-ring-delete-test ()
+(ert-deftest dyn-ring-delete-segment-test ()
   ;; empty ring
   (let ((ring (make-dyn-ring))
         (segment (dyn-ring-make-segment 1)))
-    (should (null (dyn-ring-delete ring segment)))
+    (should (null (dyn-ring-delete-segment ring segment)))
     (should (dyn-ring-empty-p ring)))
 
   ;; 1-element ring
   (fixture-1-ring
    (lambda ()
-     (should (dyn-ring-delete ring segment))
+     (should (dyn-ring-delete-segment ring segment))
      (should (dyn-ring-empty-p ring))))
 
   ;; 2-element ring
   (fixture-2-ring
    (lambda ()
      ;; delete head
-     (should (dyn-ring-delete ring seg2))
+     (should (dyn-ring-delete-segment ring seg2))
      (should (= 1 (dyn-ring-size ring)))
      (should (eq seg1 (dyn-ring-head ring)))
      (should (segments-are-linked-p seg1 seg1))))
   (fixture-2-ring
    (lambda ()
      ;; delete non-head
-     (should (dyn-ring-delete ring seg1))
+     (should (dyn-ring-delete-segment ring seg1))
      (should (= 1 (dyn-ring-size ring)))
      (should (eq seg2 (dyn-ring-head ring)))
      (should (segments-are-linked-p seg2 seg2))))
@@ -392,7 +392,7 @@
   (fixture-3-ring
    (lambda ()
      ;; delete head
-     (should (dyn-ring-delete ring seg3))
+     (should (dyn-ring-delete-segment ring seg3))
      (should (= 2 (dyn-ring-size ring)))
      (should (eq seg2 (dyn-ring-head ring)))
      (should (segments-are-linked-p seg2 seg1))
@@ -400,7 +400,7 @@
   (fixture-3-ring
    (lambda ()
      ;; delete right
-     (should (dyn-ring-delete ring seg2))
+     (should (dyn-ring-delete-segment ring seg2))
      (should (= 2 (dyn-ring-size ring)))
      (should (eq seg3 (dyn-ring-head ring)))
      (should (segments-are-linked-p seg3 seg1))
@@ -408,11 +408,67 @@
   (fixture-3-ring
    (lambda ()
      ;; delete left
-     (should (dyn-ring-delete ring seg1))
+     (should (dyn-ring-delete-segment ring seg1))
      (should (= 2 (dyn-ring-size ring)))
      (should (eq seg3 (dyn-ring-head ring)))
      (should (segments-are-linked-p seg3 seg2))
      (should (segments-are-linked-p seg2 seg3)))))
+
+(ert-deftest dyn-ring-delete-test ()
+  ;; empty ring
+  (let ((ring (make-dyn-ring)))
+    (should-not (dyn-ring-delete ring 1))
+    (should (dyn-ring-empty-p ring)))
+
+  ;; 1-element ring
+  (fixture-1-ring
+   (lambda ()
+     (should (dyn-ring-delete ring 1))
+     (should (dyn-ring-empty-p ring))))
+  (fixture-1-ring
+   (lambda ()
+     ;; non-element
+     (should-not (dyn-ring-delete ring 2))
+     (should (= 1 (dyn-ring-size ring)))))
+
+  ;; 2-element ring
+  (fixture-2-ring
+   (lambda ()
+     ;; delete head
+     (should (dyn-ring-delete ring 2))
+     (should (= 1 (dyn-ring-size ring)))))
+  (fixture-2-ring
+   (lambda ()
+     ;; delete non-head
+     (should (dyn-ring-delete ring 1))
+     (should (= 1 (dyn-ring-size ring)))))
+  (fixture-2-ring
+   (lambda ()
+     ;; non-element
+     (should-not (dyn-ring-delete ring 3))
+     (should (= 2 (dyn-ring-size ring)))))
+
+  ;; 3-element ring
+  (fixture-3-ring
+   (lambda ()
+     ;; delete head
+     (should (dyn-ring-delete ring 3))
+     (should (= 2 (dyn-ring-size ring)))))
+  (fixture-3-ring
+   (lambda ()
+     ;; delete right
+     (should (dyn-ring-delete ring 2))
+     (should (= 2 (dyn-ring-size ring)))))
+  (fixture-3-ring
+   (lambda ()
+     ;; delete left
+     (should (dyn-ring-delete ring 1))
+     (should (= 2 (dyn-ring-size ring)))))
+  (fixture-3-ring
+   (lambda ()
+     ;; non-element
+     (should-not (dyn-ring-delete ring 4))
+     (should (= 3 (dyn-ring-size ring))))))
 
 (ert-deftest dyn-ring-destroy-test ()
   ;; empty ring
@@ -842,20 +898,20 @@
      (let ((result (dyn-ring-filter ring (lambda (elem) t))))
        (should (dyn-ring-equal-p result ring)))))
 
-  ;; filter should behave the same as deletion
+  ;; filter should behave the same as deletion for unique elements
   (fixture-3-ring
    (lambda ()
      (let ((result (dyn-ring-filter ring
                                     (lambda (elem)
                                       (not (= elem 1))))))
-       (dyn-ring-delete ring seg1)
+       (dyn-ring-delete ring 1)
        (should (dyn-ring-equal-p result ring)))))
   (fixture-3-ring
    (lambda ()
      (let ((result (dyn-ring-filter ring
                                     (lambda (elem)
                                       (not (= elem 2))))))
-       (dyn-ring-delete ring seg2)
+       (dyn-ring-delete ring 2)
        (should (dyn-ring-equal-p result ring))))))
 
 (ert-deftest dyn-ring-transform-filter-test ()
@@ -904,14 +960,14 @@
        (should (dyn-ring-transform-filter ring (lambda (elem) t)))
        (should (dyn-ring-equal-p ring ring-copy)))))
 
-  ;; filter should behave the same as deletion
+  ;; filter should behave the same as deletion for unique elements
   (fixture-3-ring
    (lambda ()
      (let ((ring-copy (dyn-ring-map ring #'identity)))
        (dyn-ring-transform-filter ring-copy
                                   (lambda (elem)
                                     (not (= elem 1))))
-       (dyn-ring-delete ring seg1)
+       (dyn-ring-delete ring 1)
        (should (dyn-ring-equal-p ring ring-copy)))))
   (fixture-3-ring
    (lambda ()
@@ -919,5 +975,5 @@
        (dyn-ring-transform-filter ring-copy
                                   (lambda (elem)
                                     (not (= elem 2))))
-       (dyn-ring-delete ring seg2)
+       (dyn-ring-delete ring 2)
        (should (dyn-ring-equal-p ring ring-copy))))))
