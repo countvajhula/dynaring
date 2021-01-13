@@ -23,30 +23,41 @@
 ;; fixture recipe from:
 ;; https://www.gnu.org/software/emacs/manual/html_node/ert/Fixtures-and-Test-Suites.html
 (defun fixture-0-ring (body)
-  (unwind-protect
-      (let ((ring (make-dyn-ring)))
-        (funcall body))))
+  (let ((ring nil))
+    (unwind-protect
+        (progn (setq ring (make-dyn-ring))
+               (funcall body))
+      (dyn-ring-destroy ring))))
 
 (defun fixture-1-ring (body)
-  (unwind-protect
-      (let* ((ring (make-dyn-ring))
-             (segment (dyn-ring-insert ring 1)))
-        (funcall body))))
+  (let ((ring nil))
+    (unwind-protect
+        (progn
+          (setq ring (make-dyn-ring))
+          (let ((segment (dyn-ring-insert ring 1)))
+            (funcall body)))
+      (dyn-ring-destroy ring))))
 
 (defun fixture-2-ring (body)
-  (unwind-protect
-      (let* ((ring (make-dyn-ring))
-             (seg1 (dyn-ring-insert ring 1))
-             (seg2 (dyn-ring-insert ring 2)))
-        (funcall body))))
+  (let ((ring nil))
+    (unwind-protect
+        (progn
+          (setq ring (make-dyn-ring))
+          (let ((seg1 (dyn-ring-insert ring 1))
+                (seg2 (dyn-ring-insert ring 2)))
+            (funcall body)))
+      (dyn-ring-destroy ring))))
 
 (defun fixture-3-ring (body)
-  (unwind-protect
-      (let* ((ring (make-dyn-ring))
-             (seg1 (dyn-ring-insert ring 1))
-             (seg2 (dyn-ring-insert ring 2))
-             (seg3 (dyn-ring-insert ring 3)))
-        (funcall body))))
+  (let ((ring nil))
+    (unwind-protect
+        (progn
+          (setq ring (make-dyn-ring))
+          (let ((seg1 (dyn-ring-insert ring 1))
+                (seg2 (dyn-ring-insert ring 2))
+                (seg3 (dyn-ring-insert ring 3)))
+            (funcall body)))
+      (dyn-ring-destroy ring))))
 
 ;;
 ;; Test utilities
