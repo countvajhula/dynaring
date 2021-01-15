@@ -545,14 +545,14 @@
      (should (dyn-ring-rotate-until ring
                                     #'dyn-ring-rotate-left
                                     (lambda (element)
-                                      t)))
+                                      (not (= 2 element)))))
      (should (eq seg1 (dyn-ring-head ring)))))
   (fixture-2-ring
    (lambda ()
      (should (dyn-ring-rotate-until ring
                                     #'dyn-ring-rotate-right
                                     (lambda (element)
-                                      t)))
+                                      (not (= 2 element)))))
      (should (eq seg1 (dyn-ring-head ring)))))
 
   ;; 3-element ring
@@ -561,14 +561,14 @@
      (should (dyn-ring-rotate-until ring
                                     #'dyn-ring-rotate-left
                                     (lambda (element)
-                                      t)))
+                                      (not (= 3 element)))))
      (should (eq seg1 (dyn-ring-head ring)))))
   (fixture-3-ring
    (lambda ()
      (should (dyn-ring-rotate-until ring
                                     #'dyn-ring-rotate-right
                                     (lambda (element)
-                                      t)))
+                                      (not (= 3 element)))))
      (should (eq seg2 (dyn-ring-head ring)))))
   ;; non-trivial predicate
   (fixture-3-ring
@@ -599,7 +599,22 @@
                                         #'dyn-ring-rotate-right
                                         (lambda (element)
                                           nil)))
-     (should (eq seg3 (dyn-ring-head ring))))))
+     (should (eq seg3 (dyn-ring-head ring)))))
+  ;; if predicate is true on the head, it does not rotate the ring
+  (fixture-2-ring
+   (lambda ()
+     (should (dyn-ring-rotate-until ring
+                                    #'dyn-ring-rotate-left
+                                    (lambda (element)
+                                      t)))
+     (should (eq seg2 (dyn-ring-head ring)))))
+  (fixture-2-ring
+   (lambda ()
+     (should (dyn-ring-rotate-until ring
+                                    #'dyn-ring-rotate-right
+                                    (lambda (element)
+                                      t)))
+     (should (eq seg2 (dyn-ring-head ring))))))
 
 (ert-deftest dyn-ring-find-test ()
   ;; empty ring

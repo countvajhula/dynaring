@@ -326,9 +326,9 @@ and orientation."
     (catch 'stop
 
       (when start
-        (when (= (dyn-ring-size ring) 1)
-          (if (funcall fn (dyn-ring-value ring))
-              (throw 'stop t)
+        (if (funcall fn (dyn-ring-value ring))
+            (throw 'stop t)
+          (when (= (dyn-ring-size ring) 1)
             (throw 'stop nil)))
 
         (funcall direction ring)
