@@ -1,3 +1,5 @@
+;; Note: we want to retain dynamic binding for these tests because the
+;; ERT "fixtures" rely on it.
 
 ;; Add source paths to load path so the tests can find the source files
 ;; Adapted from:
@@ -14,7 +16,6 @@
 ;;
 
 (require 'dynamic-ring)
-(require 'cl)
 
 ;;
 ;; Fixtures

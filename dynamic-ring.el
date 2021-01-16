@@ -29,9 +29,6 @@
 
 (defconst dynamic-ring-version "0.1.1" "dynamic-ring version")
 
-(eval-when-compile
-  (require 'cl))
-
 ;;
 ;; ring structure
 ;;
