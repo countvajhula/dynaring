@@ -40,6 +40,7 @@
       (dyn-ring-destroy ring))))
 
 (defun fixture-2-ring (body)
+  ;; [2] - 1 - [2]
   (let ((ring nil))
     (unwind-protect
         (progn
@@ -50,6 +51,7 @@
       (dyn-ring-destroy ring))))
 
 (defun fixture-3-ring (body)
+  ;; [3] - 2 - 1 - [3]
   (let ((ring nil))
     (unwind-protect
         (progn
@@ -317,7 +319,7 @@
        (should (segments-are-linked-p seg2 new))
        (should (segments-are-linked-p new seg2)))))
 
-  ;; two-element ring
+  ;; 3-element ring
   (fixture-3-ring
    (lambda ()
      (let ((new (dyn-ring-break-insert ring 3)))
