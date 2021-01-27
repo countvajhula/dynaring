@@ -1,10 +1,12 @@
-;;; dynamic-ring.el --- A dynamically sized ring structure. -*- lexical-binding: t -*-
+;;; dynamic-ring.el --- A dynamically sized ring structure -*- lexical-binding: t -*-
 
-;; Copyright (C) 2009 Mike Mattie
-;; Author: Mike Mattie codermattie@gmail.com
+;; Author: Mike Mattie <codermattie@gmail.com>
+;;         Sid Kasivajhula <sid@countvajhula.com>
 ;; Maintainer: Mike Mattie codermattie@gmail.com
+;; URL: https://github.com/countvajhula/dynamic-ring
 ;; Created: 2009-4-16
 ;; Version: 0.0.2
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This file is NOT a part of Gnu Emacs.
 
@@ -24,6 +26,8 @@
 ;; along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+
+;; A dynamically sized ring structure.
 
 ;;; Code:
 
