@@ -38,60 +38,43 @@
 ;;
 
 (defun make-dyn-ring ()
-  "make-dyn-ring
+  "Return a new dynamic ring stucture.
 
-   Return a new dynamic ring stucture. A ring structure is a cons
-   cell where the car is the current head element of
-   the ring, and the cdr is the number of elements in the ring.
-  "
+A ring structure is a cons cell where the car is the current head
+element of the ring, and the cdr is the number of elements in the
+ring."
   (cons nil 0))
 
 (defun dyn-ring-head (ring)
-  "dyn-ring-head RING
-
-   Return the head segment of the RING.
-  "
+  "Return the head segment of the RING."
   (car ring))
 
 (defun dyn-ring-set-head (ring new-head)
-  "dyn-ring-set-head RING NEW-HEAD
-
-   Set the head of the RING to NEW-HEAD.
-  "
+  "Set the head of the RING to NEW-HEAD."
   (setcar ring new-head))
 
 (defun dyn-ring-empty-p (ring)
-  "dyn-ring-empty-p RING
-
-   return t if RING has no elements.
-  "
+  "Return t if RING has no elements."
   (not (dyn-ring-head ring)))
 
 (defun dyn-ring-size (ring)
-  "dyn-ring-size RING
-
-   Return the number of elements in RING.
-  "
+  "Return the number of elements in RING."
   (cdr ring))
 
 (defun dyn-ring-set-size (ring new-size)
-  "dyn-ring-set-size RING NEW-SIZE
-
-   Set the size of RING to NEW-SIZE.
-  "
+  "Set the size of RING to NEW-SIZE."
   (setcdr ring new-size))
 
 (defun dyn-ring-value (ring)
-  "dyn-ring-value RING
-
-   Return the value of RING's head segment.
-  "
+  "Return the value of RING's head segment."
   (let ((head (dyn-ring-head ring)))
     (when head
       (dyn-ring-segment-value head))))
 
 (defun dyn-ring-equal-p (r1 r2)
-  "Check if two rings are equal in their values, structure,
+  "Check if two rings R1 and R2 are equal.
+
+Equality of rings is defined in terms of contained values, structure,
 and orientation."
   (equal (dyn-ring-values r1)
          (dyn-ring-values r2)))
@@ -104,18 +87,15 @@ and orientation."
 (defconst dyn-ring-value   1)
 
 (defun dyn-ring-make-segment (value)
-  "dyn-ring-make-segment VALUE
+  "Create a new dynamic ring segment containing VALUE.
 
-   Create a new dynamic ring segment with VALUE.
+A segment stores a value within a ring with linkage to the
+other segments in the ring.  It is an array.
 
-   A segment stores a value within a ring with linkage to the
-   other segments in the ring. It is an array.
+[linkage,value]
 
-   [linkage,value]
-
-   linkage is a cons cell. The car points to the left segment in
-   the ring. The cdr points to the right segment in the ring.
-  "
+linkage is a cons cell.  The car points to the left segment in
+the ring.  The cdr points to the right segment in the ring."
   (let
     ((new-elm (make-vector 2 nil)))
     (aset new-elm dyn-ring-value value)
@@ -123,52 +103,31 @@ and orientation."
     new-elm))
 
 (defun dyn-ring-segment-value (segment)
-  "dyn-ring-segment-value SEGMENT
-
-   Return the value of SEGMENT.
-   "
+  "Return the value of SEGMENT."
   (aref segment dyn-ring-value))
 
 (defun dyn-ring-segment-set-value (segment value)
-  "dyn-ring-segment-set-value SEGMENT VALUE
-
-   Set the value of SEGMENT to VALUE.
-  "
+  "Set the value of SEGMENT to VALUE."
   (aset segment dyn-ring-value value))
 
 (defun dyn-ring-segment-linkage (segment)
-  "dyn-ring-segment-linkage SEGMENT
-
-   Return the linkage of SEGMENT.
-   "
+  "Return the linkage of SEGMENT."
   (aref segment dyn-ring-linkage))
 
 (defun dyn-ring-segment-previous (segment)
-  "dyn-ring-segment-previous SEGMENT
-
-   Return the previous segment in the ring.
-   "
+  "Return the previous SEGMENT in the ring."
   (car (dyn-ring-segment-linkage segment)))
 
 (defun dyn-ring-segment-set-previous (segment new-segment)
-  "dyn-ring-segment-set-previous SEGMENT
-
-   Set the previous segment in the ring to NEW-SEGMENT.
-   "
+  "Set the previous SEGMENT in the ring to NEW-SEGMENT."
   (setcar (dyn-ring-segment-linkage segment) new-segment))
 
 (defun dyn-ring-segment-next (segment)
-  "dyn-ring-segment-next SEGMENT
-
-   Return the next segment in the ring.
-   "
+  "Return the next SEGMENT in the ring."
   (cdr (dyn-ring-segment-linkage segment)))
 
 (defun dyn-ring-segment-set-next (segment new-segment)
-  "dyn-ring-segment-set-next SEGMENT
-
-   Set the previous segment in the ring to NEW-SEGMENT.
-   "
+  "Set the previous SEGMENT in the ring to NEW-SEGMENT."
   (setcdr (dyn-ring-segment-linkage segment) new-segment))
 
 ;;
@@ -176,13 +135,10 @@ and orientation."
 ;;
 
 (defun dyn-ring-traverse (ring fn)
-  "dyn-ring-traverse RING FN
+  "Walk the elements of RING passing each element to FN.
 
-   walk all of the elements in RING passing each
-   element to FN. This performs FN as a side effect and
-   does not modify the ring in any way, nor does it
-   return a result.
-  "
+This performs FN as a side effect and does not modify the ring in any
+way, nor does it return a result."
   (let ((head (dyn-ring-head ring)))
     (when head
       (funcall fn (dyn-ring-segment-value head))
@@ -194,12 +150,10 @@ and orientation."
         t))))
 
 (defun dyn-ring-traverse-collect (ring fn)
-  "dyn-ring-traverse-collect RING FN
+  "Walk the elements of RING passing each element to FN.
 
-   Walk the elements of RING passing each element to FN.  The
-   values of FN for each element is collected into a list and
-   returned.
-  "
+The values of FN for each element are collected into a list and
+returned."
   (let ((output nil))
     (dyn-ring-traverse ring
                        (lambda (element)
@@ -207,14 +161,13 @@ and orientation."
     output))
 
 (defun dyn-ring-map (ring fn)
-  "dyn-ring-map RING FN
+  "Derive a new ring by transforming RING under FN.
 
-   Walk the elements of RING passing each element to FN, creating
-   a new ring containing the transformed elements. This does not
-   modify the original RING.
+Walk the elements of RING passing each element to FN, creating a new
+ring containing the transformed elements.  This does not modify the
+original RING.
 
-   dyn-ring-transform-map is a mutating version of this interface.
-  "
+`dyn-ring-transform-map` is a mutating version of this interface."
   (let ((new-ring (make-dyn-ring)))
     (if (dyn-ring-empty-p ring)
         new-ring
@@ -230,15 +183,13 @@ and orientation."
           new-ring)))))
 
 (defun dyn-ring-filter (ring predicate)
-  "dyn-ring-filter RING PREDICATE
+  "Derive a new ring by filtering RING using PREDICATE.
 
-   Walk the elements of RING passing each element to PREDICATE,
-   creating a new ring containing those elements for which
-   PREDICATE returns a non-nil result. This does not modify the
-   original RING.
+Walk the elements of RING passing each element to PREDICATE, creating
+a new ring containing those elements for which PREDICATE returns a
+non-nil result.  This does not modify the original RING.
 
-   dyn-ring-transform-filter is a mutating version of this interface.
-  "
+`dyn-ring-transform-filter` is a mutating version of this interface."
   (let ((new-ring (make-dyn-ring)))
     (if (dyn-ring-empty-p ring)
         new-ring
@@ -260,14 +211,12 @@ and orientation."
         new-ring))))
 
 (defun dyn-ring-transform-map (ring fn)
-  "dyn-ring-map RING FN
+  "Transform the RING by mapping each of its elements under FN.
 
-   Transform the RING by mapping each of its elements under FN.
-   This mutates the existing ring.
+This mutates the existing ring.
 
-   dyn-ring-map is a functional (non-mutating) version of this
-   interface.
-  "
+`dyn-ring-map` is a functional (non-mutating) version of this
+interface."
   (unless (dyn-ring-empty-p ring)
     (let ((head (dyn-ring-head ring)))
       (dyn-ring-segment-set-value head
@@ -281,16 +230,13 @@ and orientation."
       t)))
 
 (defun dyn-ring-transform-filter (ring predicate)
-  "dyn-ring-filter RING PREDICATE
+  "Transform RING by filtering its elements using PREDICATE.
 
-   Transform RING by passing each element to PREDICATE,
-   retaining only those elements for which
-   PREDICATE returns a non-nil result. This mutates the
-   existing RING.
+This retains only those elements for which PREDICATE returns a non-nil
+result.  This mutates the existing RING.
 
-   dyn-ring-filter is a functional (non-mutating) version of this
-   interface.
-  "
+`dyn-ring-filter` is a functional (non-mutating) version of this
+interface."
   (unless (dyn-ring-empty-p ring)
     (let* ((head (dyn-ring-head ring))
            (current (dyn-ring-segment-previous head))
@@ -310,17 +256,16 @@ and orientation."
       t)))
 
 (defun dyn-ring-rotate-until (ring direction fn)
-  "dyn-ring-rotate-until RING DIRECTION FN
+  "Rotate the RING until some condition is met.
 
-   Rotate the head of RING in DIRECTION which is one of two
-   functions: dyn-ring-rotate-right or dyn-ring-rotate-left.
+DIRECTION specifies which direction to rotate in, and must be one of
+two functions: `dyn-ring-rotate-right` or `dyn-ring-rotate-left`.
 
-   The rotation continues until FN predicate which evaluates the
-   new head element of each rotation returns non-nil.
+The rotation continues until the FN predicate which evaluates the new
+head element of each rotation returns non-nil.
 
-   If the predicate does not return non-nil the ring is reset to
-   the head element it started with.
-  "
+If the predicate does not return non-nil the ring is reset to the head
+element it started with."
   (let
     ((start (dyn-ring-head ring)))
 
@@ -342,16 +287,15 @@ and orientation."
         nil)) ))
 
 (defun dyn-ring-find (ring predicate)
-  "dyn-ring-find RING PREDICATE
+  "Search RING for elements matching PREDICATE.
 
-   Search RING for elements matching PREDICATE, a function that
-   evaluates non-nil for for the desired elements.
+PREDICATE is expected to be a function that evaluates to non-nil for
+the desired elements.
 
-   The list of matching elements is returned.
+The list of matching elements is returned.
 
-   WARNING: this interface is DEPRECATED. Favor using dyn-ring-filter
-   followed by dyn-ring-values instead.
-  "
+WARNING: this interface is DEPRECATED.  Favor using `dyn-ring-filter`
+followed by `dyn-ring-values` instead."
   (let ((found nil))
     (dyn-ring-traverse ring
                        (lambda (element)
@@ -360,15 +304,14 @@ and orientation."
     found))
 
 (defun dyn-ring--find (ring predicate direction)
-  "dyn-ring--find RING PREDICATE DIRECTION
+  "Search RING for an element matching a PREDICATE.
 
-   Search RING in DIRECTION for the first element that
-   matches PREDICATE. DIRECTION must be either dyn-ring-segment-next
-   (to search forward) or dyn-ring-segment-previous (to search backwards).
+Searches in DIRECTION for the first element that matches PREDICATE.
+DIRECTION must be either `dyn-ring-segment-next` (to search forward)
+or `dyn-ring-segment-previous` (to search backwards).
 
-   The ring segment containing the matching element is returned, or nil
-   if a matching element isn't found.
-  "
+The ring segment containing the matching element is returned, or nil
+if a matching element isn't found."
   (unless (dyn-ring-empty-p ring)
     (let* ((head (dyn-ring-head ring))
            (current head))
@@ -383,25 +326,21 @@ and orientation."
             nil))))))
 
 (defun dyn-ring-find-forwards (ring predicate)
-  "dyn-ring-find-forwards RING PREDICATE
+  "Search RING in the forward direction.
 
-   Search RING in the forward direction for the first element that
-   matches PREDICATE.
+Searches for the first element that matches PREDICATE.
 
-   The ring segment containing the matching element is returned, or nil
-   if a matching element isn't found.
-  "
+The ring segment containing the matching element is returned, or nil
+if a matching element isn't found."
   (dyn-ring--find ring predicate #'dyn-ring-segment-next))
 
 (defun dyn-ring-find-backwards (ring predicate)
-  "dyn-ring-find-forward RING PREDICATE
+  "Search RING in the backward direction.
 
-   Search RING in the backward direction for the first element that
-   matches PREDICATE.
+Searches for the first element that matches PREDICATE.
 
-   The ring segment containing the matching element is returned, or nil
-   if a matching element isn't found.
-  "
+The ring segment containing the matching element is returned, or nil
+if a matching element isn't found."
   (dyn-ring--find ring predicate #'dyn-ring-segment-previous))
 
 (defun dyn-ring-contains-p (ring element)
@@ -415,14 +354,11 @@ and orientation."
 ;;
 
 (defun dyn-ring-destroy (ring)
-  "dyn-ring-destroy  RING
+  "Delete the RING.
 
-   - INTERNAL -
-
-   Delete the RING. The circular linkage of a ring structure
-   makes it doubtful that the garbage collector will be able to
-   free a ring without calling dyn-ring-destroy.
-  "
+The circular linkage of a ring structure makes it doubtful that the
+garbage collector will be able to free a ring without calling
+`dyn-ring-destroy`."
   (unless (dyn-ring-empty-p ring)
     (let
         ((current (dyn-ring-head ring)))
@@ -450,11 +386,9 @@ and orientation."
   (dyn-ring-segment-set-next previous next))
 
 (defun dyn-ring-insert (ring element)
-  "dyn-ring-insert RING ELEMENT
+  "Insert ELEMENT into RING.
 
-   Insert ELEMENT into RING. The head of the ring
-   will be the new ELEMENT
-  "
+The head of the ring will be the new ELEMENT."
   (let ((segment (dyn-ring-make-segment element))
         (ring-size (dyn-ring-size ring))
         (head (dyn-ring-head ring)))
@@ -476,29 +410,23 @@ and orientation."
     segment))
 
 (defun dyn-ring--unlink-segment (segment)
-  "dyn-ring--unlink-segment SEGMENT
+  "Unlink SEGMENT from its neighboring segments.
 
-   Unlink SEGMENT by relinking its left and right segments to
-   each other.
-  "
+Unlinks the SEGMENT by relinking its left and right segments to
+each other."
   (dyn-ring--link (dyn-ring-segment-previous segment)
                   (dyn-ring-segment-next segment)))
 
 (defun dyn-ring--free-segment (segment)
-  "dyn-ring--free-segment SEGMENT
+  "Nullify links in SEGMENT.
 
-   Nullify links in SEGMENT. This is an extra precaution
-to make sure that the garbage collector reclaims it (e.g.
-if the segment happens to point to itself).
-  "
+This is an extra precaution to make sure that the garbage collector
+reclaims it (e.g. if the segment happens to point to itself)."
   (dyn-ring-segment-set-next segment nil)
   (dyn-ring-segment-set-previous segment nil))
 
 (defun dyn-ring-delete-segment (ring segment)
-  "dyn-ring-delete-segment RING SEGMENT
-
-   Delete SEGMENT from RING.
-  "
+  "Delete SEGMENT from RING."
   (let
     ((ring-size (dyn-ring-size ring)))
 
@@ -519,10 +447,7 @@ if the segment happens to point to itself).
       t)))
 
 (defun dyn-ring-delete (ring element)
-  "dyn-ring-delete RING ELEMENT
-
-   Delete ELEMENT from RING.
-  "
+  "Delete ELEMENT from RING."
   (let ((segment (dyn-ring-find-forwards ring
                                          (lambda (elem)
                                            (eq elem element)))))
@@ -530,45 +455,36 @@ if the segment happens to point to itself).
       (dyn-ring-delete-segment ring segment))))
 
 (defun dyn-ring-rotate-left (ring)
-  "dyn-ring-rotate-left RING
+  "Rotate the RING towards the left.
 
-   Rotate the head of ring to the element left of the current
-   head.
-  "
+Rotate the head of ring to the element left of the current head."
   (unless (dyn-ring-empty-p ring)
     (dyn-ring-set-head ring
                        (dyn-ring-segment-previous
                         (dyn-ring-head ring)))))
 
 (defun dyn-ring-rotate-right (ring)
-  "dyn-ring-rotate-right RING
+  "Rotate the RING towards the RIGHT.
 
-   Rotate the head of ring to the element right of the current
-   head.
-  "
+Rotate the head of ring to the element right of the current head."
   (unless (dyn-ring-empty-p ring)
     (dyn-ring-set-head ring
                        (dyn-ring-segment-next
                         (dyn-ring-head ring)))))
 
 (defun dyn-ring-break-insert (ring element)
-  "dyn-ring-break-insert RING ELEMENT
+  "Add ELEMENT to the RING or move it to the head if already present.
 
-   Add ELEMENT to the RING. This performs a simple insertion if the
-   element isn't already in the ring. In the case where the element is
-   already in the ring, the element is removed from its original
-   location and re-inserted at the head.  Essentially, the ring is
-   \"broken\" and \"recast\" to place the element at the head. This can
-   be used to model \"recency.\"
-  "
+This performs a simple insertion if the element isn't already in the
+ring.  In the case where the element is already in the ring, the
+element is removed from its original location and re-inserted at the
+head.  Essentially, the ring is \"broken\" and \"recast\" to place the
+element at the head.  This can be used to model \"recency.\""
   (dyn-ring-delete ring element)
   (dyn-ring-insert ring element))
 
 (defun dyn-ring-values (ring)
-  "dyn-ring-values RING
-
-   A list of all values contained in the RING.
-  "
+  "A list of all values contained in the RING."
   (dyn-ring-traverse-collect ring #'identity))
 
 (provide 'dynamic-ring)
