@@ -16,6 +16,7 @@
 ;;
 
 (require 'dynamic-ring)
+(require 'cl-lib)
 
 ;;
 ;; Fixtures
@@ -186,8 +187,8 @@
   (fixture-0-ring
    (lambda ()
      (let ((memo (list)))
-       (letf ((memofn (lambda (arg)
-                        (push arg memo))))
+       (cl-letf ((memofn (lambda (arg)
+                           (push arg memo))))
          (should-not (dyn-ring-traverse ring memofn))
          (should (null memo))))))
 
@@ -195,8 +196,8 @@
   (fixture-1-ring
    (lambda ()
      (let ((memo (list)))
-       (letf ((memofn (lambda (arg)
-                        (push arg memo))))
+       (cl-letf ((memofn (lambda (arg)
+                           (push arg memo))))
          (should (dyn-ring-traverse ring memofn))
          (should (equal memo (list 1)))))))
 
@@ -204,8 +205,8 @@
   (fixture-2-ring
    (lambda ()
      (let ((memo (list)))
-       (letf ((memofn (lambda (arg)
-                        (push arg memo))))
+       (cl-letf ((memofn (lambda (arg)
+                           (push arg memo))))
          (should (dyn-ring-traverse ring memofn))
          (should (equal memo (list 1 2)))))))
 
@@ -213,8 +214,8 @@
   (fixture-3-ring
    (lambda ()
      (let ((memo (list)))
-       (letf ((memofn (lambda (arg)
-                        (push arg memo))))
+       (cl-letf ((memofn (lambda (arg)
+                           (push arg memo))))
          (should (dyn-ring-traverse ring memofn))
          (should (equal memo (list 1 2 3))))))))
 
@@ -886,33 +887,33 @@
   ;; empty ring
   (fixture-0-ring
    (lambda ()
-     (let ((result (dyn-ring-filter ring #'oddp)))
+     (let ((result (dyn-ring-filter ring #'cl-oddp)))
        (should (dyn-ring-equal-p result ring)))))
 
   ;; one-element ring
   (fixture-1-ring
    (lambda ()
-     (let ((result (dyn-ring-filter ring #'oddp)))
+     (let ((result (dyn-ring-filter ring #'cl-oddp)))
        (should (dyn-ring-equal-p result ring)))))
   (fixture-1-ring
    (lambda ()
-     (let ((result (dyn-ring-filter ring #'evenp)))
+     (let ((result (dyn-ring-filter ring #'cl-evenp)))
        (should (dyn-ring-empty-p result)))))
 
   ;; two-element ring
   (fixture-2-ring
    (lambda ()
-     (let ((result (dyn-ring-filter ring #'oddp)))
+     (let ((result (dyn-ring-filter ring #'cl-oddp)))
        (should (equal (list 1) (dyn-ring-values result))))))
   (fixture-2-ring
    (lambda ()
-     (let ((result (dyn-ring-filter ring #'evenp)))
+     (let ((result (dyn-ring-filter ring #'cl-evenp)))
        (should (equal (list 2) (dyn-ring-values result))))))
 
   ;; 3-element ring
   (fixture-3-ring
    (lambda ()
-     (let ((result (dyn-ring-filter ring #'oddp)))
+     (let ((result (dyn-ring-filter ring #'cl-oddp)))
        (should (equal (list 1 3) (dyn-ring-values result))))))
 
   ;; filter out all
@@ -947,33 +948,33 @@
   ;; empty ring
   (fixture-0-ring
    (lambda ()
-     (should-not (dyn-ring-transform-filter ring #'oddp))))
+     (should-not (dyn-ring-transform-filter ring #'cl-oddp))))
 
   ;; one-element ring
   (fixture-1-ring
    (lambda ()
-     (should (dyn-ring-transform-filter ring #'oddp))
+     (should (dyn-ring-transform-filter ring #'cl-oddp))
      (should (= 1 (dyn-ring-value ring)))
      (should (= 1 (dyn-ring-size ring)))))
   (fixture-1-ring
    (lambda ()
-     (should (dyn-ring-transform-filter ring #'evenp))
+     (should (dyn-ring-transform-filter ring #'cl-evenp))
      (should (dyn-ring-empty-p ring))))
 
   ;; two-element ring
   (fixture-2-ring
    (lambda ()
-     (should (dyn-ring-transform-filter ring #'oddp))
+     (should (dyn-ring-transform-filter ring #'cl-oddp))
      (should (equal (list 1) (dyn-ring-values ring)))))
   (fixture-2-ring
    (lambda ()
-     (should (dyn-ring-transform-filter ring #'evenp))
+     (should (dyn-ring-transform-filter ring #'cl-evenp))
      (should (equal (list 2) (dyn-ring-values ring)))))
 
   ;; 3-element ring
   (fixture-3-ring
    (lambda ()
-     (should (dyn-ring-transform-filter ring #'oddp))
+     (should (dyn-ring-transform-filter ring #'cl-oddp))
      (should (equal (list 1 3) (dyn-ring-values ring)))))
 
   ;; filter out all
