@@ -31,7 +31,7 @@
 
 ;;; Code:
 
-(defconst dynamic-ring-version "0.1.1" "dynamic-ring version")
+(defconst dynamic-ring-version "0.1.1")
 
 ;;
 ;; ring structure
