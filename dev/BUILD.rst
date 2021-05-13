@@ -41,20 +41,20 @@ Build steps
 
   # In melpa git repo
   make clean
-  make recipes/dynamic-ring
-  make sandbox INSTALL=dynamic-ring
+  make recipes/dynaring
+  make sandbox INSTALL=dynaring
 
 7. For a new release, you can check that MELPA stable finds it
 
 .. code-block:: bash
 
   # In melpa git repo
-  STABLE=t make recipes/dynamic-ring
+  STABLE=t make recipes/dynaring
 
 Drafting a New Release
 ======================
 
-1. Bump the version in the :code:`dynamic-ring.el` header and commit the changes
+1. Bump the version in the :code:`dynaring.el` header and commit the changes
 
 .. code-block:: elisp
 

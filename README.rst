@@ -1,3 +1,3 @@
-dynamic-ring
-============
-A dynamically sized ring structure
+dynaring
+========
+A dynamically sized ring data structure for Emacs.

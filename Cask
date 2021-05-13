@@ -1,7 +1,7 @@
 (source gnu)
 (source melpa)
 
-(package-file "dynamic-ring.el")
+(package-file "dynaring.el")
 
 (development
  (depends-on "f")
