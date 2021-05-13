@@ -37,7 +37,7 @@
 ;; ring structure
 ;;
 
-(defun make-dynaring ()
+(defun dynaring-make ()
   "Return a new dynamic ring stucture.
 
 A ring structure is a cons cell where the car is the current head
@@ -168,7 +168,7 @@ ring containing the transformed elements.  This does not modify the
 original RING.
 
 `dynaring-transform-map` is a mutating version of this interface."
-  (let ((new-ring (make-dynaring)))
+  (let ((new-ring (dynaring-make)))
     (if (dynaring-empty-p ring)
         new-ring
       (let ((head (dynaring-head ring)))
@@ -190,7 +190,7 @@ a new ring containing those elements for which PREDICATE returns a
 non-nil result.  This does not modify the original RING.
 
 `dynaring-transform-filter` is a mutating version of this interface."
-  (let ((new-ring (make-dynaring)))
+  (let ((new-ring (dynaring-make)))
     (if (dynaring-empty-p ring)
         new-ring
       (let* ((head (dynaring-head ring))

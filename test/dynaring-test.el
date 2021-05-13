@@ -27,7 +27,7 @@
 (defun fixture-0-ring (body)
   (let ((ring nil))
     (unwind-protect
-        (progn (setq ring (make-dynaring))
+        (progn (setq ring (dynaring-make))
                (funcall body))
       (dynaring-destroy ring))))
 
@@ -35,7 +35,7 @@
   (let ((ring nil))
     (unwind-protect
         (progn
-          (setq ring (make-dynaring))
+          (setq ring (dynaring-make))
           (let ((segment (dynaring-insert ring 1)))
             (funcall body)))
       (dynaring-destroy ring))))
@@ -45,7 +45,7 @@
   (let ((ring nil))
     (unwind-protect
         (progn
-          (setq ring (make-dynaring))
+          (setq ring (dynaring-make))
           (let ((seg1 (dynaring-insert ring 1))
                 (seg2 (dynaring-insert ring 2)))
             (funcall body)))
@@ -56,7 +56,7 @@
   (let ((ring nil))
     (unwind-protect
         (progn
-          (setq ring (make-dynaring))
+          (setq ring (dynaring-make))
           (let ((seg1 (dynaring-insert ring 1))
                 (seg2 (dynaring-insert ring 2))
                 (seg3 (dynaring-insert ring 3)))
@@ -81,29 +81,29 @@
 
 (ert-deftest dynaring-test ()
   ;; null constructor
-  (should (make-dynaring))
+  (should (dynaring-make))
 
   ;; dynaring-empty-p
-  (should (dynaring-empty-p (make-dynaring)))
-  (let ((ring (make-dynaring)))
+  (should (dynaring-empty-p (dynaring-make)))
+  (let ((ring (dynaring-make)))
     (dynaring-insert ring 1)
     (should-not (dynaring-empty-p ring)))
 
   ;; dynaring-size
-  (should (= 0 (dynaring-size (make-dynaring))))
-  (let ((ring (make-dynaring)))
+  (should (= 0 (dynaring-size (dynaring-make))))
+  (let ((ring (dynaring-make)))
     (dynaring-insert ring 1)
     (should (= 1 (dynaring-size ring))))
 
   ;; dynaring-head
-  (should (null (dynaring-head (make-dynaring))))
-  (let* ((ring (make-dynaring))
+  (should (null (dynaring-head (dynaring-make))))
+  (let* ((ring (dynaring-make))
          (segment (dynaring-insert ring 1)))
     (should (equal segment (dynaring-head ring))))
 
   ;; dynaring-value
-  (should (null (dynaring-value (make-dynaring))))
-  (let ((ring (make-dynaring)))
+  (should (null (dynaring-value (dynaring-make))))
+  (let ((ring (dynaring-make)))
     (dynaring-insert ring 1)
     (should (= 1 (dynaring-value ring)))))
 
@@ -123,11 +123,11 @@
                (dynaring-segment-value segment))))
 
   ;; dynaring-segment-previous and dynaring-segment-next
-  (let* ((ring (make-dynaring))
+  (let* ((ring (dynaring-make))
          (head (dynaring-insert ring 1)))
     (should (eq head (dynaring-segment-previous head)))
     (should (eq head (dynaring-segment-next head))))
-  (let* ((ring (make-dynaring))
+  (let* ((ring (dynaring-make))
          (seg1 (dynaring-insert ring 1))
          (seg2 (dynaring-insert ring 2)))
     (should (eq seg2 (dynaring-segment-previous seg1)))
@@ -139,8 +139,8 @@
   ;; empty ring
   (fixture-0-ring
    (lambda ()
-     (let* ((r2 (make-dynaring))
-            (r3 (make-dynaring)))
+     (let* ((r2 (dynaring-make))
+            (r3 (dynaring-make)))
        (dynaring-insert r3 1)
        (should (dynaring-equal-p ring r2))
        (should-not (dynaring-equal-p ring r3)))))
@@ -148,8 +148,8 @@
   ;; 1-element ring
   (fixture-1-ring
    (lambda ()
-     (let* ((r2 (make-dynaring))
-            (r3 (make-dynaring)))
+     (let* ((r2 (dynaring-make))
+            (r3 (dynaring-make)))
        (dynaring-insert r2 1)
        (dynaring-insert r3 1)
        (dynaring-insert r3 1)
@@ -159,8 +159,8 @@
   ;; 2-element ring
   (fixture-2-ring
    (lambda ()
-     (let* ((r2 (make-dynaring))
-            (r3 (make-dynaring)))
+     (let* ((r2 (dynaring-make))
+            (r3 (dynaring-make)))
        (dynaring-insert r2 1)
        (dynaring-insert r2 2)
        (dynaring-insert r3 1)
@@ -171,8 +171,8 @@
   ;; 3-element ring
   (fixture-3-ring
    (lambda ()
-     (let* ((r2 (make-dynaring))
-            (r3 (make-dynaring)))
+     (let* ((r2 (dynaring-make))
+            (r3 (dynaring-make)))
        (dynaring-insert r2 1)
        (dynaring-insert r2 2)
        (dynaring-insert r2 3)
@@ -376,7 +376,7 @@
 
 (ert-deftest dynaring-delete-segment-test ()
   ;; empty ring
-  (let ((ring (make-dynaring))
+  (let ((ring (dynaring-make))
         (segment (dynaring-make-segment 1)))
     (should (null (dynaring-delete-segment ring segment)))
     (should (dynaring-empty-p ring)))
@@ -431,7 +431,7 @@
 
 (ert-deftest dynaring-delete-test ()
   ;; empty ring
-  (let ((ring (make-dynaring)))
+  (let ((ring (dynaring-make)))
     (should-not (dynaring-delete ring 1))
     (should (dynaring-empty-p ring)))
 
