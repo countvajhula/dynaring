@@ -6,7 +6,7 @@
 ;; URL: https://github.com/countvajhula/dynaring
 ;; Created: 2009-4-16
 ;; Version: 0.0.2
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "25.1"))
 
 ;; This file is NOT a part of Gnu Emacs.
 
