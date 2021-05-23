@@ -13,6 +13,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@master
+      - name: Install Cask
+        run: |
+          git clone https://github.com/cask/cask ~/.cask
+          PATH=$HOME/.cask/bin:$PATH
       - name: Install Package and its Dependencies
         run: make install
       - name: Lint
