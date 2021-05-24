@@ -18,6 +18,9 @@
 
 ;;
 
+(when (require 'undercover nil t)
+  (undercover))
+
 (require 'dynaring)
 (require 'cl-lib)
 
