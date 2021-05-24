@@ -58,4 +58,7 @@ build :
 test: build
 	${CASK} exec ert-runner
 
-.PHONY:	help lint lint+less lint-no-noise checkdoc build clean install test
+cover-local:
+	UNDERCOVER_FORCE=true UNDERCOVER_CONFIG='("*.el" (:report-file "coverage/local-report.json") (:report-format text) (:send-report nil))' ${CASK} exec ert-runner
+
+.PHONY:	help lint lint+less lint-no-noise checkdoc build clean install test cover-local
