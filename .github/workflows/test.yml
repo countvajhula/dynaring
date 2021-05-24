@@ -27,7 +27,7 @@ jobs:
       - name: Install Emacs
         uses: purcell/setup-emacs@master
         with:
-          version: '26.3'
+          version: ${{ matrix.emacs_version }}
       - name: Install Cask
         uses: conao3/setup-cask@master
         with:
