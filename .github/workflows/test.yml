@@ -17,8 +17,6 @@ jobs:
           - 'snapshot'
     name: Test on Emacs ${{ matrix.emacs_version }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
       - name: Install Python
         uses: actions/setup-python@v2
         with:
@@ -32,6 +30,8 @@ jobs:
         uses: conao3/setup-cask@master
         with:
           version: 'snapshot'
+      - name: Checkout
+        uses: actions/checkout@master
       - name: Install Package and its Dependencies
         run: make install
       - name: Lint
@@ -43,3 +43,29 @@ jobs:
         run: make build
       - name: Run Tests
         run: make test
+  coverage:
+    needs: test
+    env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+    steps:
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+          architecture: 'x64'
+      - name: Install Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: 'snapshot'
+      - name: Install Cask
+        uses: conao3/setup-cask@master
+        with:
+          version: 'snapshot'
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Install Package and its Dependencies
+        run: make install
+      - name: Generate Coverage Report
+        run: make cover-coveralls
+      - name: Upload Coverage
+        run: curl "https://coveralls.io/webhook?repo_name=$GITHUB_REPOSITORY&repo_token=$COVERALLS_REPO_TOKEN" -d "payload[build_num]=$GITHUB_RUN_NUMBER&payload[status]=done"
