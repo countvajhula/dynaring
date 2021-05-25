@@ -68,7 +68,5 @@ jobs:
         uses: actions/checkout@master
       - name: Install Package and its Dependencies
         run: make install
-      - name: Generate Coverage Report
+      - name: Report Coverage
         run: make cover-coveralls
-      - name: Upload Coverage
-        run: curl "https://coveralls.io/webhook?repo_name=$GITHUB_REPOSITORY&repo_token=$COVERALLS_REPO_TOKEN" -d "payload[build_num]=$GITHUB_RUN_NUMBER&payload[status]=done"
