@@ -623,58 +623,6 @@
                                       t)))
      (should (eq seg2 (dynaring-head ring))))))
 
-(ert-deftest dynaring-find-test ()
-  ;; empty ring
-  (fixture-0-ring
-   (lambda ()
-     (should-not (dynaring-find ring
-                                (lambda (element)
-                                  t)))))
-
-  ;; 1-element ring
-  (fixture-1-ring
-   (lambda ()
-     (should (equal (list 1)
-                    (dynaring-find ring
-                                   (lambda (element)
-                                     (= 1 element)))))
-     (should-not (dynaring-find ring
-                                (lambda (element)
-                                  nil)))))
-
-  ;; 2-element ring
-  (fixture-2-ring
-   (lambda ()
-     (should (equal (list 1)
-                    (dynaring-find ring
-                                   (lambda (element)
-                                     (= 1 element)))))
-     (let ((result (dynaring-find ring
-                                  (lambda (element)
-                                    (> element 0)))))
-       (should (member 1 result))
-       (should (member 2 result)))
-     (should-not (dynaring-find ring
-                                (lambda (element)
-                                  nil)))))
-
-  ;; 3-element ring
-  (fixture-3-ring
-   (lambda ()
-     (should (equal (list 1)
-                    (dynaring-find ring
-                                   (lambda (element)
-                                     (= 1 element)))))
-     (let ((result (dynaring-find ring
-                                  (lambda (element)
-                                    (> element 1)))))
-       (should (member 2 result))
-       (should (member 3 result))
-       (should-not (member 1 result)))
-     (should-not (dynaring-find ring
-                                (lambda (element)
-                                  nil))))))
-
 (ert-deftest dynaring-find-forwards-test ()
   ;; empty ring
   (fixture-0-ring

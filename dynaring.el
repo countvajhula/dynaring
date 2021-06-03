@@ -288,23 +288,6 @@ element it started with."
           (funcall direction ring))
         nil)) ))
 
-(defun dynaring-find (ring predicate)
-  "Search RING for elements matching PREDICATE.
-
-PREDICATE is expected to be a function that evaluates to non-nil for
-the desired elements.
-
-The list of matching elements is returned.
-
-WARNING: this interface is DEPRECATED.  Favor using `dynaring-filter`
-followed by `dynaring-values` instead."
-  (let ((found nil))
-    (dynaring-traverse ring
-                       (lambda (element)
-                         (when (funcall predicate element)
-                           (push element found))))
-    found))
-
 (defun dynaring--find (ring predicate direction)
   "Search RING for an element matching a PREDICATE.
 
