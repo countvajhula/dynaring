@@ -344,7 +344,22 @@
        (should new)
        (should (= 1 (dynaring-value ring)))
        (should (segments-are-linked-p seg2 new))
-       (should (segments-are-linked-p new seg3))))))
+       (should (segments-are-linked-p new seg3)))))
+
+  ;; break-insert should not change the structure
+  ;; when the element is already at head
+  (fixture-3-ring
+   (lambda ()
+     (let ((original-order (dynaring-values ring)))
+       (let ((new (dynaring-break-insert ring 3)))
+         (should new)
+         (should (equal original-order (dynaring-values ring)))))))
+  (fixture-3-ring
+   (lambda ()
+     (let ((original-order (dynaring-values ring)))
+       (let ((new (dynaring-break-insert ring 2)))
+         (should new)
+         (should-not (equal original-order (dynaring-values ring))))))))
 
 (ert-deftest dynaring-rotate-test ()
   ;; empty ring
