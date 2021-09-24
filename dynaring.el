@@ -5,7 +5,7 @@
 ;; Maintainer: Sid Kasivajhula <sid@countvajhula.com>
 ;; URL: https://github.com/countvajhula/dynaring
 ;; Created: 2009-4-16
-;; Version: 0.2.0
+;; Version: 0.3
 ;; Package-Requires: ((emacs "25.1"))
 
 ;; This file is NOT a part of Gnu Emacs.
@@ -31,7 +31,7 @@
 
 ;;; Code:
 
-(defconst dynaring-version "0.2.0")
+(defconst dynaring-version "0.3")
 
 (require 'seq)
 
