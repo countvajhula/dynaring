@@ -469,7 +469,14 @@ element at the head.  This can be used to model \"recency.\""
   (dynaring-insert ring element))
 
 (defun dynaring-values (ring)
-  "A list of all values contained in the RING."
+  "A list of all values contained in the RING.
+
+The values are obtained by traversing the ring from the end back
+around to the head, so the head will be the last item in the list
+rather than the first one. Aside from that, while the order of the
+other elements will remain consistent with a linearization of the ring
+structure, it is otherwise arbitrary, since we could go around the
+ring in either direction."
   (dynaring-traverse-collect ring #'identity))
 
 (provide 'dynaring)
