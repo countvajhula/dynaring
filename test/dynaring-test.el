@@ -86,6 +86,14 @@
   ;; null constructor
   (should (dynaring-make))
 
+  ;; predicate
+  (should (dynaringp (dynaring-make)))
+  (should-not (dynaringp (list 1 2 3)))
+  (should-not (dynaringp (cons 1 "hi")))
+  (let ((ring (dynaring-make)))
+    (dynaring-insert ring 1)
+    (should (dynaringp ring)))
+
   ;; dynaring-empty-p
   (should (dynaring-empty-p (dynaring-make)))
   (let ((ring (dynaring-make)))
@@ -108,7 +116,16 @@
   (should (null (dynaring-value (dynaring-make))))
   (let ((ring (dynaring-make)))
     (dynaring-insert ring 1)
-    (should (= 1 (dynaring-value ring)))))
+    (should (= 1 (dynaring-value ring))))
+
+  ;; variadic constructor
+  (should (dynaring 1 2 3))
+  (let ((ring (dynaring 1 2 3)))
+    (should (dynaringp ring))
+    ;; see the comment on the "variadic insertion"
+    ;; test re: ensuring order of insertion
+    (should (= 3 (dynaring-value ring)))
+    (should (= 3 (dynaring-size ring)))))
 
 (ert-deftest dynaring-segment-test ()
   ;; constructor
@@ -273,7 +290,23 @@
        (should (= 3 (dynaring-value ring)))
        (should (segments-are-linked-p seg1 new))
        (should (segments-are-linked-p new seg2))
-       (should (segments-are-linked-p seg2 seg1))))))
+       (should (segments-are-linked-p seg2 seg1)))))
+
+  ;; variadic insertion
+  (fixture-0-ring
+   (lambda ()
+     (should (dynaring-insert ring 1 2 3))
+     ;; although inserting the elements in forward order
+     ;; is the current behavior,
+     ;; I'm not sure we really need to provide
+     ;; an assurance that the elements will be
+     ;; inserted in a particular order, as long as it's
+     ;; an isomorphic order to the input list (i.e.
+     ;; either forward or reverse order could be OK).
+     ;; But for now, we will explicitly test this
+     ;; to ensure that any changes here are intentional.
+     (should (= 3 (dynaring-value ring)))
+     (should (= 3 (dynaring-size ring))))))
 
 (ert-deftest dynaring-break-insert-test ()
   ;; empty ring

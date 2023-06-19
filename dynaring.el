@@ -47,6 +47,18 @@ element of the ring, and the cdr is the number of elements in the
 ring."
   (cons nil 0))
 
+(defun dynaringp (value)
+  "Check if VALUE is a dynamic ring.
+
+Note that as the dynamic ring is implemented just as a cons cell
+rather than as a named type, this only checks whether VALUE is a cons
+cell with the expected structure (i.e. one where the cdr is a number).
+It cannot assert with certainty that such a cons cell is in fact a
+valid dynamic ring, so it should be used with caution.  It does
+reliably exclude lists, and anything else that isn't a cons cell."
+  (and (consp value)
+       (numberp (cdr value))))
+
 (defun dynaring-head (ring)
   "Return the head segment of the RING."
   (car ring))
@@ -329,7 +341,7 @@ if a matching element isn't found."
   (dynaring--find ring predicate #'dynaring-segment-previous))
 
 (defun dynaring-contains-p (ring element)
-  "Predicate to check whether RING contains ELEMENT."
+  "Predicate to check whether ELEMENT is in RING."
   (dynaring-find-forwards ring
                           (lambda (elem)
                             (eq elem element))))
@@ -370,7 +382,7 @@ garbage collector will be able to free a ring without calling
   (dynaring-segment-set-previous next previous)
   (dynaring-segment-set-next previous next))
 
-(defun dynaring-insert (ring element)
+(defun dynaring--insert (ring element)
   "Insert ELEMENT into RING.
 
 The head of the ring will be the new ELEMENT."
@@ -393,6 +405,24 @@ The head of the ring will be the new ELEMENT."
 
     ;; return the newly inserted segment.
     segment))
+
+(defun dynaring-insert (ring &rest elements)
+  "Insert ELEMENTS into RING.
+
+Elements are inserted in order, so that the last element inserted
+becomes the new head."
+  (dolist (element elements)
+    (dynaring--insert ring element))
+  (dynaring-head ring))
+
+(defun dynaring (&rest elements)
+  "Create a new dynamic ring containing ELEMENTS.
+
+The elements are inserted in order, so that the last one becomes the
+head.  See `dynaring-make` for more on the data structure."
+  (let ((ring (dynaring-make)))
+    (apply #'dynaring-insert ring elements)
+    ring))
 
 (defun dynaring--unlink-segment (segment)
   "Unlink SEGMENT from its neighboring segments.
