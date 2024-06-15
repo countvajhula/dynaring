@@ -33,8 +33,6 @@
 
 (defconst dynaring-version "0.3")
 
-(require 'seq)
-
 ;;
 ;; ring structure
 ;;
