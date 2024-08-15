@@ -54,6 +54,12 @@ the ring.  The cdr points to the right segment in the ring."
     (aset new-elm dynaring-linkage (cons nil nil))
     new-elm))
 
+(defun dynaring-segment-p (value)
+  "Check if VALUE is a dynaring segment.
+
+This is a crude predicate that could be improved if needed."
+  (vectorp value))
+
 (defun dynaring-segment-value (segment)
   "Return the value of SEGMENT."
   (aref segment dynaring-value))
