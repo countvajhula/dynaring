@@ -84,8 +84,10 @@ the ring.  The cdr points to the right segment in the ring."
 
 (defun dynaring--link (previous next)
   "Link PREVIOUS and NEXT to one another."
-  (dynaring-segment-set-previous next previous)
-  (dynaring-segment-set-next previous next))
+  (when next
+    (dynaring-segment-set-previous next previous))
+  (when previous
+    (dynaring-segment-set-next previous next)))
 
 (defun dynaring--unlink-segment (segment)
   "Unlink SEGMENT from its neighboring segments.
