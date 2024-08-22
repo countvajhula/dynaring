@@ -69,6 +69,13 @@
     (unwind-protect
         (funcall body))))
 
+(defmacro with-fixture (fixture &rest test)
+  "Run TEST using FIXTURE."
+  (declare (indent 1))
+  `(,fixture
+    (lambda ()
+      ,@test)))
+
 ;;
 ;; Test utilities
 ;;
@@ -283,109 +290,61 @@
   ;; empty ring
   (fixture-0-dll
    (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should-not (dynaring-dll-traverse-forwards dll memofn))
-          (should (null memo)))))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
+         (should-not (dynaring-dll-traverse-forwards dll memofn))
+         (should (null memo))))))
 
   ;; one-element dll
   (fixture-1-dll
    (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should (dynaring-dll-traverse-forwards dll memofn))
-          (should (equal memo (list 1))))))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
+         (should (dynaring-dll-traverse-forwards dll memofn))
+         (should (equal memo (list 1)))))))
 
   ;; two-element dll
   (fixture-2-dll
    (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should (dynaring-dll-traverse-forwards dll memofn))
-          (should (equal memo
-                         ;; consed each time, so order is reversed
-                         (list 2 1))))))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
+         (should (dynaring-dll-traverse-forwards dll memofn))
+         (should (equal memo
+                        ;; consed each time, so order is reversed
+                        (list 2 1)))))))
 
   ;; 3-element dll
   (fixture-3-dll
    (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should (dynaring-dll-traverse-forwards dll memofn))
-          (should (equal memo
-                         ;; consed each time, so order is reversed
-                         (list 3 2 1)))))))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
+         (should (dynaring-dll-traverse-forwards dll memofn))
+         (should (equal memo
+                        ;; consed each time, so order is reversed
+                        (list 3 2 1))))))))
 
 (ert-deftest dynaring-dll-traverse-backwards-test ()
   ;; empty ring
   (fixture-0-dll
    (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should-not (dynaring-dll-traverse-backwards dll memofn))
-          (should (null memo)))))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
+         (should-not (dynaring-dll-traverse-backwards dll memofn))
+         (should (null memo))))))
 
   ;; one-element dll
   (fixture-1-dll
    (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should (dynaring-dll-traverse-backwards dll memofn))
-          (should (equal memo (list 1))))))))
-
-  ;; two-element dll
-  (fixture-2-dll
-   (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should (dynaring-dll-traverse-backwards dll memofn))
-          (should (equal memo
-                         ;; consed each time, so order is reversed
-                         (list 1 2))))))))
-
-  ;; 3-element dll
-  (fixture-3-dll
-   (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should (dynaring-dll-traverse-backwards dll memofn))
-          (should (equal memo
-                         ;; consed each time, so order is reversed
-                         (list 1 2 3)))))))))
-
-(ert-deftest dynaring-dll-traverse-collect-test ()
-  ;; empty ring
-  (fixture-0-dll
-   (lambda ()
-     (fixture-memo-fn
-      (lambda ()
-        (let ((memo (list)))
-          (should-not (dynaring-dll-traverse-backwards dll memofn))
-          (should (null memo)))))))
-
-  ;; one-element dll
-  (fixture-1-dll
-   (lambda ()
-     (let ((memo (list)))
-       (cl-letf ((memofn (lambda (arg)
-                           (push arg memo))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
          (should (dynaring-dll-traverse-backwards dll memofn))
          (should (equal memo (list 1)))))))
 
   ;; two-element dll
   (fixture-2-dll
    (lambda ()
-     (let ((memo (list)))
-       (cl-letf ((memofn (lambda (arg)
-                           (push arg memo))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
          (should (dynaring-dll-traverse-backwards dll memofn))
          (should (equal memo
                         ;; consed each time, so order is reversed
@@ -394,9 +353,8 @@
   ;; 3-element dll
   (fixture-3-dll
    (lambda ()
-     (let ((memo (list)))
-       (cl-letf ((memofn (lambda (arg)
-                           (push arg memo))))
+     (with-fixture fixture-memo-fn
+       (let ((memo (list)))
          (should (dynaring-dll-traverse-backwards dll memofn))
          (should (equal memo
                         ;; consed each time, so order is reversed
