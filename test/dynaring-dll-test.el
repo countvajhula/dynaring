@@ -320,43 +320,48 @@
 
 (ert-deftest dynaring-dll-traverse-collect-test ()
   ;; empty ring
-  (fixture-0-dll
-   (lambda ()
-     (with-fixture fixture-memo-fn
-       (let ((memo (list)))
-         (should-not (dynaring-dll-traverse-backwards dll memofn))
-         (should (null memo))))))
+  (with-fixture fixture-0-dll
+    (should-not (dynaring-dll-traverse-collect dll #'1+)))
 
   ;; one-element dll
-  (fixture-1-dll
-   (lambda ()
-     (let ((memo (list)))
-       (cl-letf ((memofn (lambda (arg)
-                           (push arg memo))))
-         (should (dynaring-dll-traverse-backwards dll memofn))
-         (should (equal memo (list 1)))))))
+  (with-fixture fixture-1-dll
+    (should (equal (dynaring-dll-traverse-collect dll #'1+)
+                   (list 2))))
 
   ;; two-element dll
-  (fixture-2-dll
-   (lambda ()
-     (let ((memo (list)))
-       (cl-letf ((memofn (lambda (arg)
-                           (push arg memo))))
-         (should (dynaring-dll-traverse-backwards dll memofn))
-         (should (equal memo
-                        ;; consed each time, so order is reversed
-                        (list 1 2)))))))
+  (with-fixture fixture-2-dll
+    (should (equal (dynaring-dll-traverse-collect dll #'1+)
+                   (list 2 3))))
 
   ;; 3-element dll
-  (fixture-3-dll
-   (lambda ()
-     (with-fixture fixture-memo-fn
-       (let ((memo (list)))
-         (should (dynaring-dll-traverse-backwards dll memofn))
-         (should (equal memo
-                        ;; consed each time, so order is reversed
-                        (list 1 2 3))))))))
-;; HERE
-;; dynaring-dll-traverse-collect-test
-;; dynaring-dll-map-test
+  (with-fixture fixture-3-dll
+    (should (equal (dynaring-dll-traverse-collect dll #'1+)
+                   (list 2 3 4)))))
+
+(ert-deftest dynaring-dll-map-test ()
+  ;; empty ring
+  (with-fixture fixture-0-dll
+    (let ((result (dynaring-dll-map dll #'1+)))
+      (should (dynaring-dll-empty-p result))))
+
+  ;; one-element dll
+  (with-fixture fixture-1-dll
+    (let ((result (dynaring-dll-map dll #'1+)))
+      (should
+       (equal (dynaring-dll-values result)
+              (seq-map #'1+ (dynaring-dll-values dll))))))
+
+  ;; two-element dll
+  (with-fixture fixture-2-dll
+    (let ((result (dynaring-dll-map dll #'1+)))
+      (should (equal (dynaring-dll-values result)
+                     (seq-map #'1+ (dynaring-dll-values dll))))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (let ((result (dynaring-dll-map dll #'1+)))
+      (should (equal (dynaring-dll-values result)
+                     (seq-map #'1+ (dynaring-dll-values dll)))))))
+
+;; HERE:
 
