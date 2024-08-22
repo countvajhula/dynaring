@@ -66,6 +66,13 @@
             (funcall body)))
       (dynaring-destroy ring))))
 
+(defun fixture-memo (body)
+  (cl-letf ((memofn (lambda (arg)
+                      (push arg memo)))
+            (memo (list)))
+    (unwind-protect
+        (funcall body))))
+
 (defmacro with-fixture (fixture &rest test)
   "Run TEST using FIXTURE."
   (declare (indent 1))
@@ -181,35 +188,27 @@
 (ert-deftest dynaring-traverse-test ()
   ;; empty ring
   (with-fixture fixture-0-ring
-    (let ((memo (list)))
-      (cl-letf ((memofn (lambda (arg)
-                          (push arg memo))))
-        (should-not (dynaring-traverse ring memofn))
-        (should (null memo)))))
+    (with-fixture fixture-memo
+      (should-not (dynaring-traverse ring memofn))
+      (should (null memo))))
 
   ;; one-element ring
   (with-fixture fixture-1-ring
-    (let ((memo (list)))
-      (cl-letf ((memofn (lambda (arg)
-                          (push arg memo))))
-        (should (dynaring-traverse ring memofn))
-        (should (equal memo (list 1))))))
+    (with-fixture fixture-memo
+      (should (dynaring-traverse ring memofn))
+      (should (equal memo (list 1)))))
 
   ;; two-element ring
   (with-fixture fixture-2-ring
-    (let ((memo (list)))
-      (cl-letf ((memofn (lambda (arg)
-                          (push arg memo))))
-        (should (dynaring-traverse ring memofn))
-        (should (equal memo (list 1 2))))))
+    (with-fixture fixture-memo
+      (should (dynaring-traverse ring memofn))
+      (should (equal memo (list 1 2)))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
-    (let ((memo (list)))
-      (cl-letf ((memofn (lambda (arg)
-                          (push arg memo))))
-        (should (dynaring-traverse ring memofn))
-        (should (equal memo (list 1 2 3)))))))
+    (with-fixture fixture-memo
+      (should (dynaring-traverse ring memofn))
+      (should (equal memo (list 1 2 3))))))
 
 (ert-deftest dynaring-traverse-collect-test ()
   ;; empty ring
