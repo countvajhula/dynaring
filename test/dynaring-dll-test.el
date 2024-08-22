@@ -63,9 +63,10 @@
                 (seg3 (dynaring-dll-insert-tail dll 3)))
             (funcall body))))))
 
-(defun fixture-memo-fn (body)
+(defun fixture-memo (body)
   (cl-letf ((memofn (lambda (arg)
-                      (push arg memo))))
+                      (push arg memo)))
+            (memo (list)))
     (unwind-protect
         (funcall body))))
 
@@ -262,68 +263,60 @@
 (ert-deftest dynaring-dll-traverse-forwards-test ()
   ;; empty ring
   (with-fixture fixture-0-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should-not (dynaring-dll-traverse-forwards dll memofn))
-        (should (null memo)))))
+    (with-fixture fixture-memo
+      (should-not (dynaring-dll-traverse-forwards dll memofn))
+      (should (null memo))))
 
   ;; one-element dll
   (with-fixture fixture-1-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should (dynaring-dll-traverse-forwards dll memofn))
-        (should (equal memo (list 1))))))
+    (with-fixture fixture-memo
+      (should (dynaring-dll-traverse-forwards dll memofn))
+      (should (equal memo (list 1)))))
 
   ;; two-element dll
   (with-fixture fixture-2-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should (dynaring-dll-traverse-forwards dll memofn))
-        (should (equal memo
-                       ;; consed each time, so order is reversed
-                       (list 2 1))))))
+    (with-fixture fixture-memo
+      (should (dynaring-dll-traverse-forwards dll memofn))
+      (should (equal memo
+                     ;; consed each time, so order is reversed
+                     (list 2 1)))))
 
   ;; 3-element dll
   (with-fixture fixture-3-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should (dynaring-dll-traverse-forwards dll memofn))
-        (should (equal memo
-                       ;; consed each time, so order is reversed
-                       (list 3 2 1)))))))
+    (with-fixture fixture-memo
+      (should (dynaring-dll-traverse-forwards dll memofn))
+      (should (equal memo
+                     ;; consed each time, so order is reversed
+                     (list 3 2 1))))))
 
 (ert-deftest dynaring-dll-traverse-backwards-test ()
   ;; empty ring
   (with-fixture fixture-0-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should-not (dynaring-dll-traverse-backwards dll memofn))
-        (should (null memo)))))
+    (with-fixture fixture-memo
+      (should-not (dynaring-dll-traverse-backwards dll memofn))
+      (should (null memo))))
 
   ;; one-element dll
   (with-fixture fixture-1-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should (dynaring-dll-traverse-backwards dll memofn))
-        (should (equal memo (list 1))))))
+    (with-fixture fixture-memo
+      (should (dynaring-dll-traverse-backwards dll memofn))
+      (should (equal memo (list 1)))))
 
   ;; two-element dll
   (with-fixture fixture-2-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should (dynaring-dll-traverse-backwards dll memofn))
-        (should (equal memo
-                       ;; consed each time, so order is reversed
-                       (list 1 2))))))
+    (with-fixture fixture-memo
+      (should (dynaring-dll-traverse-backwards dll memofn))
+      (should (equal memo
+                     ;; consed each time, so order is reversed
+                     (list 1 2)))))
 
   ;; 3-element dll
   (with-fixture fixture-3-dll
-    (with-fixture fixture-memo-fn
-      (let ((memo (list)))
-        (should (dynaring-dll-traverse-backwards dll memofn))
-        (should (equal memo
-                       ;; consed each time, so order is reversed
-                       (list 1 2 3)))))))
+    (with-fixture fixture-memo
+      (should (dynaring-dll-traverse-backwards dll memofn))
+      (should (equal memo
+                     ;; consed each time, so order is reversed
+                     (list 1 2 3))))))
 
 (ert-deftest dynaring-dll-traverse-collect-test ()
   ;; empty ring
