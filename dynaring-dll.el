@@ -139,6 +139,9 @@ Equality of DLLs is defined in terms of contained values and order."
 (defun dynaring-dll--traverse (start end fn next-fn)
   "Walk the elements of DLL passing each element to FN.
 
+Traverse the DLL from START to END using NEXT-FN, which is expected to
+be either `dynaring-segment-previous' or `dynaring-segment-next'.
+
 This performs FN as a side effect and does not modify the DLL in any
 way, nor does it return a result."
   (let ((current start))
@@ -279,7 +282,7 @@ interface."
   "Search DLL for an element matching a PREDICATE.
 
 Searches in DIRECTION starting from segment START for the first
-element that matches PREDICATE. DIRECTION must be either
+element that matches PREDICATE.  DIRECTION must be either
 `dynaring-segment-next` (to search forward) or
 `dynaring-segment-previous` (to search backwards).
 

@@ -1,4 +1,4 @@
-;;; dynaring.el --- A dynamically sized ring structure -*- lexical-binding: t -*-
+;;; dynaring-segment.el --- A dynamically sized ring structure -*- lexical-binding: t -*-
 
 ;; Author: Mike Mattie <codermattie@gmail.com>
 ;;         Sid Kasivajhula <sid@countvajhula.com>
