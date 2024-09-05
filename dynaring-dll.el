@@ -34,21 +34,7 @@
 (require 'dynaring-segment)
 
 ;;
-;; ring structure
-;;
-
-;;; Interface:
-;;
-;;   - make
-;;   - insert-before
-;;   - insert-after
-;;   - insert-head
-;;   - insert-tail
-;;   - head
-;;   - tail
-;;   - traverse
-;;   - delete
-;;   - delete-segment
+;; DLL structure
 ;;
 
 (defun dynaring-dll-make ()
@@ -224,9 +210,6 @@ original DLL.
                                            (dynaring-segment-value current)))
         new-dll))))
 
-;; HERE: continue writing tests to catch up
-;; to current implementation. It would make
-;; things faster as we iterate
 (defun dynaring-dll-filter (dll predicate)
   "Derive a new DLL by filtering DLL using PREDICATE.
 
@@ -236,8 +219,22 @@ non-nil result.  This does not modify the original DLL.
 
 `dynaring-dll-transform-filter` is a mutating version of this
 interface."
-  ;; TODO
-  nil)
+  (let ((new-dll (dynaring-dll-make)))
+    (if (dynaring-dll-empty-p dll)
+        new-dll
+      (let ((current (dynaring-dll-head dll))
+            (tail (dynaring-dll-tail dll)))
+        (while (not (eq current tail))
+          (let ((value (dynaring-segment-value current)))
+            (when (funcall predicate value)
+              (dynaring-dll-insert-tail new-dll
+                                        value))
+            (setq current (dynaring-segment-next current))))
+        (let ((value (dynaring-segment-value current)))
+          (when (funcall predicate value)
+            (dynaring-dll-insert-tail new-dll
+                                      value)))
+        new-dll))))
 
 (defun dynaring-dll-transform-map (dll fn)
   "Transform the DLL by mapping each of its elements under FN.
@@ -246,8 +243,16 @@ This mutates the existing DLL.
 
 `dynaring-dll-map` is a functional (non-mutating) version of this
 interface."
-  ;; TODO
-  nil)
+  (unless (dynaring-dll-empty-p dll)
+    (let ((current (dynaring-dll-head dll))
+          (tail (dynaring-dll-tail dll)))
+      (while (not (eq current tail))
+        (dynaring-segment-set-value current
+                                    (funcall fn (dynaring-segment-value current)))
+        (setq current (dynaring-segment-next current)))
+      (dynaring-segment-set-value current
+                                  (funcall fn (dynaring-segment-value current)))
+      t)))
 
 (defun dynaring-dll-transform-filter (dll predicate)
   "Transform DLL by filtering its elements using PREDICATE.
@@ -257,20 +262,41 @@ result.  This mutates the existing DLL.
 
 `dynaring-dll-filter` is a functional (non-mutating) version of this
 interface."
-  ;; TODO
-  nil)
+  (unless (dynaring-dll-empty-p dll)
+    (let ((current (dynaring-dll-head dll))
+          (tail (dynaring-dll-tail dll)))
+      (while (not (eq tail current))
+        (if (funcall predicate (dynaring-segment-value current))
+            (setq current (dynaring-segment-next current))
+          (let ((next (dynaring-segment-next current)))
+            (dynaring-dll-delete-segment dll current)
+            (setq current next))))
+      (unless (funcall predicate (dynaring-segment-value current))
+        (dynaring-dll-delete-segment dll current))
+      t)))
 
-(defun dynaring-dll--find (dll predicate direction)
+(defun dynaring-dll--find (dll predicate start direction)
   "Search DLL for an element matching a PREDICATE.
 
-Searches in DIRECTION for the first element that matches PREDICATE.
-DIRECTION must be either `dynaring-segment-next` (to search forward)
-or `dynaring-segment-previous` (to search backwards).
+Searches in DIRECTION starting from segment START for the first
+element that matches PREDICATE. DIRECTION must be either
+`dynaring-segment-next` (to search forward) or
+`dynaring-segment-previous` (to search backwards).
 
 The segment containing the matching element is returned, or nil
 if a matching element isn't found."
-  ;; TODO
-  nil)
+  (unless (dynaring-dll-empty-p dll)
+    (let ((current start))
+      (if (funcall predicate
+                   (dynaring-segment-value current))
+          current
+        (catch 'stop
+          (let ((current (funcall direction current)))
+            (while current
+              (when (funcall predicate
+                             (dynaring-segment-value current))
+                (throw 'stop current))
+              (setq current (funcall direction current)))))))))
 
 (defun dynaring-dll-find-forwards (dll predicate)
   "Search DLL in the forward direction.
@@ -279,7 +305,10 @@ Searches for the first element that matches PREDICATE.
 
 The segment containing the matching element is returned, or nil
 if a matching element isn't found."
-  (dynaring-dll--find ring predicate #'dynaring-segment-next))
+  (dynaring-dll--find dll
+                      predicate
+                      (dynaring-dll-head dll)
+                      #'dynaring-segment-next))
 
 (defun dynaring-dll-find-backwards (dll predicate)
   "Search DLL in the backward direction.
@@ -288,7 +317,10 @@ Searches for the first element that matches PREDICATE.
 
 The segment containing the matching element is returned, or nil
 if a matching element isn't found."
-  (dynaring-dll--find ring predicate #'dynaring-segment-previous))
+  (dynaring-dll--find dll
+                      predicate
+                      (dynaring-dll-tail dll)
+                      #'dynaring-segment-previous))
 
 (defun dynaring-dll-contains-p (dll element)
   "Predicate to check whether ELEMENT is in DLL."

@@ -261,7 +261,7 @@
       (should-not (dynaring-dll-equal-p dll dll4)))))
 
 (ert-deftest dynaring-dll-traverse-forwards-test ()
-  ;; empty ring
+  ;; empty dll
   (with-fixture fixture-0-dll
     (with-fixture fixture-memo
       (should-not (dynaring-dll-traverse-forwards dll memofn))
@@ -290,7 +290,7 @@
                      (list 3 2 1))))))
 
 (ert-deftest dynaring-dll-traverse-backwards-test ()
-  ;; empty ring
+  ;; empty dll
   (with-fixture fixture-0-dll
     (with-fixture fixture-memo
       (should-not (dynaring-dll-traverse-backwards dll memofn))
@@ -319,7 +319,7 @@
                      (list 1 2 3))))))
 
 (ert-deftest dynaring-dll-traverse-collect-test ()
-  ;; empty ring
+  ;; empty dll
   (with-fixture fixture-0-dll
     (should-not (dynaring-dll-traverse-collect dll #'1+)))
 
@@ -339,7 +339,7 @@
                    (list 2 3 4)))))
 
 (ert-deftest dynaring-dll-map-test ()
-  ;; empty ring
+  ;; empty dll
   (with-fixture fixture-0-dll
     (let ((result (dynaring-dll-map dll #'1+)))
       (should (dynaring-dll-empty-p result))))
@@ -363,5 +363,358 @@
       (should (equal (dynaring-dll-values result)
                      (seq-map #'1+ (dynaring-dll-values dll)))))))
 
-;; HERE:
+(ert-deftest dynaring-dll-transform-map-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (dynaring-dll-transform-map dll #'1+)
+    (should (dynaring-dll-empty-p dll)))
 
+  ;; one-element dll
+  (with-fixture fixture-1-dll
+    (dynaring-dll-transform-map dll #'1+)
+    (should
+     (equal (dynaring-dll-values dll)
+            (seq-map #'1+ (list 1)))))
+
+  ;; two-element dll
+  (with-fixture fixture-2-dll
+    (dynaring-dll-transform-map dll #'1+)
+    (should (equal (dynaring-dll-values dll)
+                   (seq-map #'1+ (list 1 2)))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (dynaring-dll-transform-map dll #'1+)
+    (should (equal (dynaring-dll-values dll)
+                   (seq-map #'1+ (list 1 2 3))))))
+
+(ert-deftest dynaring-dll-filter-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (let ((dll2 (dynaring-dll-filter dll #'cl-oddp)))
+      (should (dynaring-dll-empty-p dll2))))
+
+  ;; one-element dll
+  (with-fixture fixture-1-dll
+    (let ((dll2 (dynaring-dll-filter dll #'cl-oddp)))
+      (should
+       (equal (dynaring-dll-values dll2)
+              (seq-filter #'cl-oddp (list 1))))))
+  (let ((dll (dynaring-dll 2)))
+    (let ((dll2 (dynaring-dll-filter dll #'cl-oddp)))
+      (should (dynaring-dll-empty-p dll2))))
+
+  ;; two-element dll
+  (with-fixture fixture-2-dll
+    (let ((dll2 (dynaring-dll-filter dll #'cl-oddp)))
+      (should (equal (dynaring-dll-values dll2)
+                     (seq-filter #'cl-oddp (list 1))))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (let ((dll2 (dynaring-dll-filter dll #'cl-oddp)))
+      (should (equal (dynaring-dll-values dll2)
+                     (seq-filter #'cl-oddp (list 1 3)))))))
+
+(ert-deftest dynaring-dll-transform-filter-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (dynaring-dll-transform-filter dll #'cl-oddp)
+    (should (dynaring-dll-empty-p dll)))
+
+  ;; one-element dll
+  (with-fixture fixture-1-dll
+    (dynaring-dll-transform-filter dll #'cl-oddp)
+    (should
+     (equal (dynaring-dll-values dll)
+            (seq-filter #'cl-oddp (list 1)))))
+  (let ((dll (dynaring-dll 2)))
+    (dynaring-dll-transform-filter dll #'cl-oddp)
+    (should (dynaring-dll-empty-p dll)))
+
+  ;; two-element dll
+  (with-fixture fixture-2-dll
+    (dynaring-dll-transform-filter dll #'cl-oddp)
+    (should (equal (dynaring-dll-values dll)
+                   (seq-filter #'cl-oddp (list 1)))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (dynaring-dll-transform-filter dll #'cl-oddp)
+    (should (equal (dynaring-dll-values dll)
+                   (seq-filter #'cl-oddp (list 1 3))))))
+
+(ert-deftest dynaring-dll-find-forwards-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (should-not
+     (dynaring-dll-find-forwards dll
+                                 (lambda (element)
+                                   t))))
+
+  ;; 1-element dll
+  (with-fixture fixture-1-dll
+    (should
+     (eq segment
+         (dynaring-dll-find-forwards dll
+                                     (lambda (element)
+                                       (= 1 element)))))
+    (should-not
+     (dynaring-dll-find-forwards dll
+                                 (lambda (element)
+                                   nil))))
+
+  ;; 2-element dll
+  (with-fixture fixture-2-dll
+    (should
+     (eq seg1
+         (dynaring-dll-find-forwards dll
+                                     (lambda (element)
+                                       (= 1 element)))))
+    (should
+     (eq seg1 (dynaring-dll-find-forwards dll
+                                          (lambda (element)
+                                            (< element 3)))))
+    (should
+     (eq seg2 (dynaring-dll-find-forwards dll
+                                          (lambda (element)
+                                            (> element 1)))))
+    (should-not
+     (dynaring-dll-find-forwards dll
+                                 (lambda (element)
+                                   nil))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (should
+     (eq seg1
+         (dynaring-dll-find-forwards dll
+                                     (lambda (element)
+                                       (= 1 element)))))
+    (should
+     (eq seg1 (dynaring-dll-find-forwards dll
+                                          (lambda (element)
+                                            (< element 4)))))
+    (should
+     (eq seg3 (dynaring-dll-find-forwards dll
+                                          (lambda (element)
+                                            (> element 2)))))
+    (should-not
+     (dynaring-dll-find-forwards dll
+                                 (lambda (element)
+                                   nil)))))
+
+(ert-deftest dynaring-dll-find-backwards-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (should-not
+     (dynaring-dll-find-backwards dll
+                                  (lambda (element)
+                                    t))))
+
+  ;; 1-element dll
+  (with-fixture fixture-1-dll
+    (should
+     (eq segment
+         (dynaring-dll-find-backwards dll
+                                      (lambda (element)
+                                        (= 1 element)))))
+    (should-not
+     (dynaring-dll-find-backwards dll
+                                  (lambda (element)
+                                    nil))))
+
+  ;; 2-element dll
+  (with-fixture fixture-2-dll
+    (should
+     (eq seg1
+         (dynaring-dll-find-backwards dll
+                                      (lambda (element)
+                                        (= 1 element)))))
+    (should
+     (eq seg2 (dynaring-dll-find-backwards dll
+                                           (lambda (element)
+                                             (< element 3)))))
+    (should
+     (eq seg2 (dynaring-dll-find-backwards dll
+                                           (lambda (element)
+                                             (> element 1)))))
+    (should-not
+     (dynaring-dll-find-backwards dll
+                                  (lambda (element)
+                                    nil))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (should
+     (eq seg1
+         (dynaring-dll-find-backwards dll
+                                      (lambda (element)
+                                        (= 1 element)))))
+    (should
+     (eq seg3 (dynaring-dll-find-backwards dll
+                                           (lambda (element)
+                                             (< element 4)))))
+    (should
+     (eq seg2 (dynaring-dll-find-backwards dll
+                                           (lambda (element)
+                                             (< element 3)))))
+    (should-not
+     (dynaring-dll-find-backwards dll
+                                  (lambda (element)
+                                    nil)))))
+
+
+(ert-deftest dynaring-dll-delete-segment-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (let ((segment (dynaring-make-segment 1)))
+      (should-not (dynaring-dll-delete-segment dll segment))
+      (should (dynaring-dll-empty-p dll))))
+
+  ;; 1-element dll
+  (with-fixture fixture-1-dll
+    (should (dynaring-dll-delete-segment dll segment))
+    (should (dynaring-dll-empty-p dll)))
+
+  ;; 2-element dll
+  (with-fixture fixture-2-dll
+    ;; delete head
+    (should (dynaring-dll-delete-segment dll seg1))
+    (should (= 1 (dynaring-dll-size dll)))
+    (should (eq seg2 (dynaring-dll-head dll)))
+    (should-not (dynaring-segment-previous seg2))
+    (should-not (dynaring-segment-next seg2)))
+  (with-fixture fixture-2-dll
+    ;; delete non-head
+    (should (dynaring-dll-delete-segment dll seg2))
+    (should (= 1 (dynaring-dll-size dll)))
+    (should (eq seg1 (dynaring-dll-head dll)))
+    (should-not (dynaring-segment-previous seg1))
+    (should-not (dynaring-segment-next seg1)))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    ;; delete head
+    (should (dynaring-dll-delete-segment dll seg1))
+    (should (= 2 (dynaring-dll-size dll)))
+    (should (eq seg2 (dynaring-dll-head dll)))
+    (should (eq seg3 (dynaring-dll-tail dll)))
+    (should (segments-are-linked-p seg2 seg3))
+    (should-not (dynaring-segment-previous seg2))
+    (should-not (dynaring-segment-next seg3)))
+  (with-fixture fixture-3-dll
+    ;; delete middle
+    (should (dynaring-dll-delete-segment dll seg2))
+    (should (= 2 (dynaring-dll-size dll)))
+    (should (eq seg1 (dynaring-dll-head dll)))
+    (should (eq seg3 (dynaring-dll-tail dll)))
+    (should (segments-are-linked-p seg1 seg3))
+    (should-not (dynaring-segment-previous seg1))
+    (should-not (dynaring-segment-next seg3)))
+  (with-fixture fixture-3-dll
+    ;; delete tail
+    (should (dynaring-dll-delete-segment dll seg3))
+    (should (= 2 (dynaring-dll-size dll)))
+    (should (eq seg1 (dynaring-dll-head dll)))
+    (should (eq seg2 (dynaring-dll-tail dll)))
+    (should (segments-are-linked-p seg1 seg2))
+    (should-not (dynaring-segment-previous seg1))
+    (should-not (dynaring-segment-next seg2))))
+
+(ert-deftest dynaring-dll-delete-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (should-not (dynaring-dll-delete dll 1))
+    (should (dynaring-dll-empty-p dll)))
+
+  ;; 1-element dll
+  (with-fixture fixture-1-dll
+    (should (dynaring-dll-delete dll 1))
+    (should (dynaring-dll-empty-p dll)))
+  (with-fixture fixture-1-dll
+    ;; non-element
+    (should-not (dynaring-dll-delete dll 2))
+    (should (= 1 (dynaring-dll-size dll))))
+
+  ;; 2-element dll
+  (with-fixture fixture-2-dll
+    ;; delete head
+    (should (dynaring-dll-delete dll 1))
+    (should (= 1 (dynaring-dll-size dll)))
+    (should (eq seg2 (dynaring-dll-head dll)))
+    (should (eq seg2 (dynaring-dll-tail dll))))
+  (with-fixture fixture-2-dll
+    ;; delete tail
+    (should (dynaring-dll-delete dll 2))
+    (should (= 1 (dynaring-dll-size dll)))
+    (should (eq seg1 (dynaring-dll-head dll)))
+    (should (eq seg1 (dynaring-dll-tail dll))))
+  (with-fixture fixture-2-dll
+    ;; non-element
+    (should-not (dynaring-dll-delete dll 3))
+    (should (= 2 (dynaring-dll-size dll))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    ;; delete head
+    (should (dynaring-dll-delete dll 1))
+    (should (= 2 (dynaring-dll-size dll)))
+    (should (eq seg2 (dynaring-dll-head dll)))
+    (should (eq seg3 (dynaring-dll-tail dll))))
+  (with-fixture fixture-3-dll
+    ;; delete tail
+    (should (dynaring-dll-delete dll 3))
+    (should (= 2 (dynaring-dll-size dll)))
+    (should (eq seg1 (dynaring-dll-head dll)))
+    (should (eq seg2 (dynaring-dll-tail dll))))
+  (with-fixture fixture-3-dll
+    ;; delete middle
+    (should (dynaring-dll-delete dll 2))
+    (should (= 2 (dynaring-dll-size dll)))
+    (should (eq seg1 (dynaring-dll-head dll)))
+    (should (eq seg3 (dynaring-dll-tail dll))))
+  (with-fixture fixture-3-dll
+    ;; non-element
+    (should-not (dynaring-dll-delete dll 4))
+    (should (= 3 (dynaring-dll-size dll)))))
+
+(ert-deftest dynaring-dll-contains-p-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (should-not (dynaring-dll-contains-p dll 1)))
+
+  ;; 1-element dll
+  (with-fixture fixture-1-dll
+    (should (dynaring-dll-contains-p dll 1))
+    (should-not (dynaring-dll-contains-p dll 2)))
+
+  ;; 2-element dll
+  (with-fixture fixture-2-dll
+    (should (dynaring-dll-contains-p dll 1))
+    (should (dynaring-dll-contains-p dll 2))
+    (should-not (dynaring-dll-contains-p dll 3)))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (should (dynaring-dll-contains-p dll 1))
+    (should (dynaring-dll-contains-p dll 2))
+    (should (dynaring-dll-contains-p dll 3))
+    (should-not (dynaring-dll-contains-p dll 4))))
+
+(ert-deftest dynaring-dll-values-test ()
+  ;; empty dll
+  (with-fixture fixture-0-dll
+    (should (null (dynaring-dll-values dll))))
+
+  ;; 1-element dll
+  (with-fixture fixture-1-dll
+    (should (equal (list 1) (dynaring-dll-values dll))))
+
+  ;; 2-element dll
+  (with-fixture fixture-2-dll
+    (should (equal (list 1 2) (dynaring-dll-values dll))))
+
+  ;; 3-element dll
+  (with-fixture fixture-3-dll
+    (should (equal (list 1 2 3) (dynaring-dll-values dll)))))
