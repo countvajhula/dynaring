@@ -32,6 +32,7 @@
 ;;; Code:
 
 (require 'dynaring-ring)
+(require 'dynaring-dll)
 
 (defconst dynaring-version "0.3")
 
