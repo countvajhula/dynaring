@@ -61,19 +61,23 @@ treated as a DLL."
 
 (defun dynaring-dll-insert-before (dll segment element)
   "Insert ELEMENT into the DLL before SEGMENT."
-  (let ((new-segment (dynaring-make-segment element)))
-    (dynaring--link new-segment segment)
-    (when (eq segment (dynaring-dll-head dll))
-      (dynaring-dll-set-head dll new-segment))
-    new-segment))
+  (if segment
+      (let ((new-segment (dynaring-make-segment element)))
+        (dynaring--link new-segment segment)
+        (when (eq segment (dynaring-dll-head dll))
+          (dynaring-dll-set-head dll new-segment))
+        new-segment)
+    (error "Can't insert before null segment!")))
 
 (defun dynaring-dll-insert-after (dll segment element)
   "Insert ELEMENT into the DLL after SEGMENT."
-  (let ((new-segment (dynaring-make-segment element)))
-    (dynaring--link segment new-segment)
-    (when (eq segment (dynaring-dll-tail dll))
-      (dynaring-dll-set-tail dll new-segment))
-    new-segment))
+  (if segment
+      (let ((new-segment (dynaring-make-segment element)))
+        (dynaring--link segment new-segment)
+        (when (eq segment (dynaring-dll-tail dll))
+          (dynaring-dll-set-tail dll new-segment))
+        new-segment)
+    (error "Can't insert after null segment!")))
 
 (defun dynaring-dll-insert-head (dll element)
   "Insert ELEMENT into the DLL as the new head."

@@ -185,6 +185,9 @@
                     (dynaring-dll-tail dll)))))
 
 (ert-deftest dynaring-dll-insert-before-test ()
+  (with-fixture fixture-0-dll
+    (should-error
+     (dynaring-dll-insert-before dll nil 1)))
   (with-fixture fixture-1-dll
     (dynaring-dll-insert-before dll
                                 (dynaring-dll-head dll)
@@ -205,6 +208,9 @@
                     (dynaring-dll-tail dll)))))
 
 (ert-deftest dynaring-dll-insert-after-test ()
+  (with-fixture fixture-0-dll
+    (should-error
+     (dynaring-dll-insert-after dll nil 1)))
   (with-fixture fixture-1-dll
     (dynaring-dll-insert-after dll
                                (dynaring-dll-head dll)
