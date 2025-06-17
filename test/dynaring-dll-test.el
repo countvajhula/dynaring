@@ -143,86 +143,86 @@
 (ert-deftest dynaring-dll-insert-head-test ()
   (with-fixture fixture-0-dll
     (dynaring-dll-insert-head dll 1)
-   (should (= 1 (dynaring-segment-value
-                 (dynaring-dll-head dll))))
-   (should (eq (dynaring-dll-head dll)
-               (dynaring-dll-tail dll))))
+    (should (= 1 (dynaring-segment-value
+                  (dynaring-dll-head dll))))
+    (should (eq (dynaring-dll-head dll)
+                (dynaring-dll-tail dll))))
   (with-fixture fixture-1-dll
     (dynaring-dll-insert-head dll 2)
-   (should (= 2 (dynaring-segment-value
-                 (dynaring-dll-head dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))
-   (should (= 1 (dynaring-segment-value
-                 (dynaring-dll-tail dll)))))
+    (should (= 2 (dynaring-segment-value
+                  (dynaring-dll-head dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))
+    (should (= 1 (dynaring-segment-value
+                  (dynaring-dll-tail dll)))))
   (with-fixture fixture-2-dll
     (dynaring-dll-insert-head dll 3)
-   (should (= 3 (dynaring-segment-value
-                 (dynaring-dll-head dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))))
+    (should (= 3 (dynaring-segment-value
+                  (dynaring-dll-head dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))))
 
 (ert-deftest dynaring-dll-insert-tail-test ()
   (with-fixture fixture-0-dll
     (dynaring-dll-insert-tail dll 1)
-   (should (= 1 (dynaring-segment-value
-                 (dynaring-dll-tail dll))))
-   (should (eq (dynaring-dll-head dll)
-               (dynaring-dll-tail dll))))
+    (should (= 1 (dynaring-segment-value
+                  (dynaring-dll-tail dll))))
+    (should (eq (dynaring-dll-head dll)
+                (dynaring-dll-tail dll))))
   (with-fixture fixture-1-dll
     (dynaring-dll-insert-tail dll 2)
-   (should (= 2 (dynaring-segment-value
-                 (dynaring-dll-tail dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))
-   (should (= 1 (dynaring-segment-value
-                 (dynaring-dll-head dll)))))
+    (should (= 2 (dynaring-segment-value
+                  (dynaring-dll-tail dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))
+    (should (= 1 (dynaring-segment-value
+                  (dynaring-dll-head dll)))))
   (with-fixture fixture-2-dll
     (dynaring-dll-insert-tail dll 3)
-   (should (= 3 (dynaring-segment-value
-                 (dynaring-dll-tail dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))))
+    (should (= 3 (dynaring-segment-value
+                  (dynaring-dll-tail dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))))
 
 (ert-deftest dynaring-dll-insert-before-test ()
   (with-fixture fixture-1-dll
     (dynaring-dll-insert-before dll
                                 (dynaring-dll-head dll)
                                 2)
-   (should (= 2 (dynaring-segment-value
-                 (dynaring-dll-head dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))
-   (should (= 1 (dynaring-segment-value
-                 (dynaring-dll-tail dll)))))
+    (should (= 2 (dynaring-segment-value
+                  (dynaring-dll-head dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))
+    (should (= 1 (dynaring-segment-value
+                  (dynaring-dll-tail dll)))))
   (with-fixture fixture-2-dll
     (dynaring-dll-insert-before dll
                                 (dynaring-dll-head dll)
                                 3)
-   (should (= 3 (dynaring-segment-value
-                 (dynaring-dll-head dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))))
+    (should (= 3 (dynaring-segment-value
+                  (dynaring-dll-head dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))))
 
 (ert-deftest dynaring-dll-insert-after-test ()
   (with-fixture fixture-1-dll
     (dynaring-dll-insert-after dll
                                (dynaring-dll-head dll)
                                2)
-   (should (= 1 (dynaring-segment-value
-                 (dynaring-dll-head dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))
-   (should (= 2 (dynaring-segment-value
-                 (dynaring-dll-tail dll)))))
+    (should (= 1 (dynaring-segment-value
+                  (dynaring-dll-head dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))
+    (should (= 2 (dynaring-segment-value
+                  (dynaring-dll-tail dll)))))
   (with-fixture fixture-2-dll
     (dynaring-dll-insert-after dll
                                (dynaring-dll-head dll)
                                3)
-   (should (= 1 (dynaring-segment-value
-                 (dynaring-dll-head dll))))
-   (should-not (eq (dynaring-dll-head dll)
-                   (dynaring-dll-tail dll)))))
+    (should (= 1 (dynaring-segment-value
+                  (dynaring-dll-head dll))))
+    (should-not (eq (dynaring-dll-head dll)
+                    (dynaring-dll-tail dll)))))
 
 (ert-deftest dynaring-dll-singleton-p-test ()
   (with-fixture fixture-0-dll

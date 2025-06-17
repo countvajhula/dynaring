@@ -235,9 +235,9 @@
   ;; empty ring
   (with-fixture fixture-0-ring
     (should (dynaring-insert ring 1))
-   (should (= 1 (dynaring-value ring)))
-   (let ((head (dynaring-head ring)))
-     (should (segments-are-linked-p head head))))
+    (should (= 1 (dynaring-value ring)))
+    (let ((head (dynaring-head ring)))
+      (should (segments-are-linked-p head head))))
 
   ;; one-element ring
   (with-fixture fixture-1-ring
@@ -259,25 +259,25 @@
   ;; variadic insertion
   (with-fixture fixture-0-ring
     (should (dynaring-insert ring 1 2 3))
-   ;; although inserting the elements in forward order
-   ;; is the current behavior,
-   ;; I'm not sure we really need to provide
-   ;; an assurance that the elements will be
-   ;; inserted in a particular order, as long as it's
-   ;; an isomorphic order to the input list (i.e.
-   ;; either forward or reverse order could be OK).
-   ;; But for now, we will explicitly test this
-   ;; to ensure that any changes here are intentional.
-   (should (= 3 (dynaring-value ring)))
-   (should (= 3 (dynaring-size ring)))))
+    ;; although inserting the elements in forward order
+    ;; is the current behavior,
+    ;; I'm not sure we really need to provide
+    ;; an assurance that the elements will be
+    ;; inserted in a particular order, as long as it's
+    ;; an isomorphic order to the input list (i.e.
+    ;; either forward or reverse order could be OK).
+    ;; But for now, we will explicitly test this
+    ;; to ensure that any changes here are intentional.
+    (should (= 3 (dynaring-value ring)))
+    (should (= 3 (dynaring-size ring)))))
 
 (ert-deftest dynaring-break-insert-test ()
   ;; empty ring
   (with-fixture fixture-0-ring
     (should (dynaring-break-insert ring 1))
-   (should (= 1 (dynaring-value ring)))
-   (let ((head (dynaring-head ring)))
-     (should (segments-are-linked-p head head))))
+    (should (= 1 (dynaring-value ring)))
+    (let ((head (dynaring-head ring)))
+      (should (segments-are-linked-p head head))))
 
   ;; one-element ring
   (with-fixture fixture-1-ring
@@ -350,28 +350,28 @@
   ;; empty ring
   (with-fixture fixture-0-ring
     (should (null (dynaring-rotate-left ring)))
-   (should (null (dynaring-rotate-right ring))))
+    (should (null (dynaring-rotate-right ring))))
 
   ;; 1-element ring
   (with-fixture fixture-1-ring
     (should (eq segment (dynaring-rotate-left ring)))
-   (should (eq segment (dynaring-rotate-right ring))))
+    (should (eq segment (dynaring-rotate-right ring))))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
     (should (eq seg1 (dynaring-rotate-left ring)))
-   (should (eq seg2 (dynaring-rotate-left ring)))
-   (should (eq seg1 (dynaring-rotate-right ring)))
-   (should (eq seg2 (dynaring-rotate-right ring))))
+    (should (eq seg2 (dynaring-rotate-left ring)))
+    (should (eq seg1 (dynaring-rotate-right ring)))
+    (should (eq seg2 (dynaring-rotate-right ring))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
     (should (eq seg1 (dynaring-rotate-left ring)))
-   (should (eq seg2 (dynaring-rotate-left ring)))
-   (should (eq seg3 (dynaring-rotate-left ring)))
-   (should (eq seg2 (dynaring-rotate-right ring)))
-   (should (eq seg1 (dynaring-rotate-right ring)))
-   (should (eq seg3 (dynaring-rotate-right ring)))))
+    (should (eq seg2 (dynaring-rotate-left ring)))
+    (should (eq seg3 (dynaring-rotate-left ring)))
+    (should (eq seg2 (dynaring-rotate-right ring)))
+    (should (eq seg1 (dynaring-rotate-right ring)))
+    (should (eq seg3 (dynaring-rotate-right ring)))))
 
 (ert-deftest dynaring-delete-segment-test ()
   ;; empty ring
@@ -383,44 +383,44 @@
   ;; 1-element ring
   (with-fixture fixture-1-ring
     (should (dynaring-delete-segment ring segment))
-   (should (dynaring-empty-p ring)))
+    (should (dynaring-empty-p ring)))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
     ;; delete head
     (should (dynaring-delete-segment ring seg2))
-   (should (= 1 (dynaring-size ring)))
-   (should (eq seg1 (dynaring-head ring)))
-   (should (segments-are-linked-p seg1 seg1)))
+    (should (= 1 (dynaring-size ring)))
+    (should (eq seg1 (dynaring-head ring)))
+    (should (segments-are-linked-p seg1 seg1)))
   (with-fixture fixture-2-ring
     ;; delete non-head
     (should (dynaring-delete-segment ring seg1))
-   (should (= 1 (dynaring-size ring)))
-   (should (eq seg2 (dynaring-head ring)))
-   (should (segments-are-linked-p seg2 seg2)))
+    (should (= 1 (dynaring-size ring)))
+    (should (eq seg2 (dynaring-head ring)))
+    (should (segments-are-linked-p seg2 seg2)))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
     ;; delete head
     (should (dynaring-delete-segment ring seg3))
-   (should (= 2 (dynaring-size ring)))
-   (should (eq seg2 (dynaring-head ring)))
-   (should (segments-are-linked-p seg2 seg1))
-   (should (segments-are-linked-p seg1 seg2)))
+    (should (= 2 (dynaring-size ring)))
+    (should (eq seg2 (dynaring-head ring)))
+    (should (segments-are-linked-p seg2 seg1))
+    (should (segments-are-linked-p seg1 seg2)))
   (with-fixture fixture-3-ring
     ;; delete right
     (should (dynaring-delete-segment ring seg2))
-   (should (= 2 (dynaring-size ring)))
-   (should (eq seg3 (dynaring-head ring)))
-   (should (segments-are-linked-p seg3 seg1))
-   (should (segments-are-linked-p seg1 seg3)))
+    (should (= 2 (dynaring-size ring)))
+    (should (eq seg3 (dynaring-head ring)))
+    (should (segments-are-linked-p seg3 seg1))
+    (should (segments-are-linked-p seg1 seg3)))
   (with-fixture fixture-3-ring
     ;; delete left
     (should (dynaring-delete-segment ring seg1))
-   (should (= 2 (dynaring-size ring)))
-   (should (eq seg3 (dynaring-head ring)))
-   (should (segments-are-linked-p seg3 seg2))
-   (should (segments-are-linked-p seg2 seg3))))
+    (should (= 2 (dynaring-size ring)))
+    (should (eq seg3 (dynaring-head ring)))
+    (should (segments-are-linked-p seg3 seg2))
+    (should (segments-are-linked-p seg2 seg3))))
 
 (ert-deftest dynaring-delete-test ()
   ;; empty ring
@@ -431,43 +431,43 @@
   ;; 1-element ring
   (with-fixture fixture-1-ring
     (should (dynaring-delete ring 1))
-   (should (dynaring-empty-p ring)))
+    (should (dynaring-empty-p ring)))
   (with-fixture fixture-1-ring
     ;; non-element
     (should-not (dynaring-delete ring 2))
-   (should (= 1 (dynaring-size ring))))
+    (should (= 1 (dynaring-size ring))))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
     ;; delete head
     (should (dynaring-delete ring 2))
-   (should (= 1 (dynaring-size ring))))
+    (should (= 1 (dynaring-size ring))))
   (with-fixture fixture-2-ring
     ;; delete non-head
     (should (dynaring-delete ring 1))
-   (should (= 1 (dynaring-size ring))))
+    (should (= 1 (dynaring-size ring))))
   (with-fixture fixture-2-ring
     ;; non-element
     (should-not (dynaring-delete ring 3))
-   (should (= 2 (dynaring-size ring))))
+    (should (= 2 (dynaring-size ring))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
     ;; delete head
     (should (dynaring-delete ring 3))
-   (should (= 2 (dynaring-size ring))))
+    (should (= 2 (dynaring-size ring))))
   (with-fixture fixture-3-ring
     ;; delete right
     (should (dynaring-delete ring 2))
-   (should (= 2 (dynaring-size ring))))
+    (should (= 2 (dynaring-size ring))))
   (with-fixture fixture-3-ring
     ;; delete left
     (should (dynaring-delete ring 1))
-   (should (= 2 (dynaring-size ring))))
+    (should (= 2 (dynaring-size ring))))
   (with-fixture fixture-3-ring
     ;; non-element
     (should-not (dynaring-delete ring 4))
-   (should (= 3 (dynaring-size ring)))))
+    (should (= 3 (dynaring-size ring)))))
 
 (ert-deftest dynaring-destroy-test ()
   ;; empty ring
@@ -477,26 +477,26 @@
   ;; 1-element ring
   (with-fixture fixture-1-ring
     (should (dynaring-destroy ring))
-   (should (null (dynaring-head ring)))
-   (should (= 0 (dynaring-size ring)))
-   (should (segment-is-free-p segment)))
+    (should (null (dynaring-head ring)))
+    (should (= 0 (dynaring-size ring)))
+    (should (segment-is-free-p segment)))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
     (should (dynaring-destroy ring))
-   (should (null (dynaring-head ring)))
-   (should (= 0 (dynaring-size ring)))
-   (should (segment-is-free-p seg1))
-   (should (segment-is-free-p seg2)))
+    (should (null (dynaring-head ring)))
+    (should (= 0 (dynaring-size ring)))
+    (should (segment-is-free-p seg1))
+    (should (segment-is-free-p seg2)))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
     (should (dynaring-destroy ring))
-   (should (null (dynaring-head ring)))
-   (should (= 0 (dynaring-size ring)))
-   (should (segment-is-free-p seg1))
-   (should (segment-is-free-p seg2))
-   (should (segment-is-free-p seg3))))
+    (should (null (dynaring-head ring)))
+    (should (= 0 (dynaring-size ring)))
+    (should (segment-is-free-p seg1))
+    (should (segment-is-free-p seg2))
+    (should (segment-is-free-p seg3))))
 
 (ert-deftest dynaring-rotate-until-test ()
   ;; empty ring
@@ -512,13 +512,13 @@
                                    #'dynaring-rotate-left
                                    (lambda (element)
                                      t)))
-   (should (eq segment (dynaring-head ring))))
+    (should (eq segment (dynaring-head ring))))
   (with-fixture fixture-1-ring
     (should-not (dynaring-rotate-until ring
                                        #'dynaring-rotate-left
                                        (lambda (element)
                                          nil)))
-   (should (eq segment (dynaring-head ring))))
+    (should (eq segment (dynaring-head ring))))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
@@ -526,13 +526,13 @@
                                    #'dynaring-rotate-left
                                    (lambda (element)
                                      (not (= 2 element)))))
-   (should (eq seg1 (dynaring-head ring))))
+    (should (eq seg1 (dynaring-head ring))))
   (with-fixture fixture-2-ring
     (should (dynaring-rotate-until ring
                                    #'dynaring-rotate-right
                                    (lambda (element)
                                      (not (= 2 element)))))
-   (should (eq seg1 (dynaring-head ring))))
+    (should (eq seg1 (dynaring-head ring))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
@@ -540,52 +540,52 @@
                                    #'dynaring-rotate-left
                                    (lambda (element)
                                      (not (= 3 element)))))
-   (should (eq seg1 (dynaring-head ring))))
+    (should (eq seg1 (dynaring-head ring))))
   (with-fixture fixture-3-ring
     (should (dynaring-rotate-until ring
                                    #'dynaring-rotate-right
                                    (lambda (element)
                                      (not (= 3 element)))))
-   (should (eq seg2 (dynaring-head ring))))
+    (should (eq seg2 (dynaring-head ring))))
   ;; non-trivial predicate
   (with-fixture fixture-3-ring
     (should (dynaring-rotate-until ring
                                    #'dynaring-rotate-left
                                    (lambda (element)
                                      (= element 2))))
-   (should (eq seg2 (dynaring-head ring))))
+    (should (eq seg2 (dynaring-head ring))))
   (with-fixture fixture-3-ring
     (should (dynaring-rotate-until ring
                                    #'dynaring-rotate-right
                                    (lambda (element)
                                      (= element 2))))
-   (should (eq seg2 (dynaring-head ring))))
+    (should (eq seg2 (dynaring-head ring))))
   ;; predicate never satisfied
   (with-fixture fixture-3-ring
     (should-not (dynaring-rotate-until ring
                                        #'dynaring-rotate-left
                                        (lambda (element)
                                          nil)))
-   (should (eq seg3 (dynaring-head ring))))
+    (should (eq seg3 (dynaring-head ring))))
   (with-fixture fixture-3-ring
     (should-not (dynaring-rotate-until ring
                                        #'dynaring-rotate-right
                                        (lambda (element)
                                          nil)))
-   (should (eq seg3 (dynaring-head ring))))
+    (should (eq seg3 (dynaring-head ring))))
   ;; if predicate is true on the head, it does not rotate the ring
   (with-fixture fixture-2-ring
     (should (dynaring-rotate-until ring
                                    #'dynaring-rotate-left
                                    (lambda (element)
                                      t)))
-   (should (eq seg2 (dynaring-head ring))))
+    (should (eq seg2 (dynaring-head ring))))
   (with-fixture fixture-2-ring
     (should (dynaring-rotate-until ring
                                    #'dynaring-rotate-right
                                    (lambda (element)
                                      t)))
-   (should (eq seg2 (dynaring-head ring)))))
+    (should (eq seg2 (dynaring-head ring)))))
 
 (ert-deftest dynaring-find-forwards-test ()
   ;; empty ring
@@ -600,9 +600,9 @@
                 (dynaring-find-forwards ring
                                         (lambda (element)
                                           (= 1 element)))))
-   (should-not (dynaring-find-forwards ring
-                                       (lambda (element)
-                                         nil))))
+    (should-not (dynaring-find-forwards ring
+                                        (lambda (element)
+                                          nil))))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
@@ -610,15 +610,15 @@
                 (dynaring-find-forwards ring
                                         (lambda (element)
                                           (= 1 element)))))
-   (should (eq seg2 (dynaring-find-forwards ring
-                                            (lambda (element)
-                                              (< element 3)))))
-   (should (eq seg1 (dynaring-find-forwards ring
-                                            (lambda (element)
-                                              (< element 2)))))
-   (should-not (dynaring-find-forwards ring
-                                       (lambda (element)
-                                         nil))))
+    (should (eq seg2 (dynaring-find-forwards ring
+                                             (lambda (element)
+                                               (< element 3)))))
+    (should (eq seg1 (dynaring-find-forwards ring
+                                             (lambda (element)
+                                               (< element 2)))))
+    (should-not (dynaring-find-forwards ring
+                                        (lambda (element)
+                                          nil))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
@@ -626,15 +626,15 @@
                 (dynaring-find-forwards ring
                                         (lambda (element)
                                           (= 1 element)))))
-   (should (eq seg3 (dynaring-find-forwards ring
-                                            (lambda (element)
-                                              (< element 4)))))
-   (should (eq seg2 (dynaring-find-forwards ring
-                                            (lambda (element)
-                                              (< element 3)))))
-   (should-not (dynaring-find-forwards ring
-                                       (lambda (element)
-                                         nil)))))
+    (should (eq seg3 (dynaring-find-forwards ring
+                                             (lambda (element)
+                                               (< element 4)))))
+    (should (eq seg2 (dynaring-find-forwards ring
+                                             (lambda (element)
+                                               (< element 3)))))
+    (should-not (dynaring-find-forwards ring
+                                        (lambda (element)
+                                          nil)))))
 
 (ert-deftest dynaring-find-backwards-test ()
   ;; empty ring
@@ -649,9 +649,9 @@
                 (dynaring-find-backwards ring
                                          (lambda (element)
                                            (= 1 element)))))
-   (should-not (dynaring-find-backwards ring
-                                        (lambda (element)
-                                          nil))))
+    (should-not (dynaring-find-backwards ring
+                                         (lambda (element)
+                                           nil))))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
@@ -659,15 +659,15 @@
                 (dynaring-find-backwards ring
                                          (lambda (element)
                                            (= 1 element)))))
-   (should (eq seg2 (dynaring-find-backwards ring
-                                             (lambda (element)
-                                               (< element 3)))))
-   (should (eq seg1 (dynaring-find-backwards ring
-                                             (lambda (element)
-                                               (< element 2)))))
-   (should-not (dynaring-find-backwards ring
-                                        (lambda (element)
-                                          nil))))
+    (should (eq seg2 (dynaring-find-backwards ring
+                                              (lambda (element)
+                                                (< element 3)))))
+    (should (eq seg1 (dynaring-find-backwards ring
+                                              (lambda (element)
+                                                (< element 2)))))
+    (should-not (dynaring-find-backwards ring
+                                         (lambda (element)
+                                           nil))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
@@ -675,15 +675,15 @@
                 (dynaring-find-backwards ring
                                          (lambda (element)
                                            (= 1 element)))))
-   (should (eq seg3 (dynaring-find-backwards ring
-                                             (lambda (element)
-                                               (< element 4)))))
-   (should (eq seg1 (dynaring-find-backwards ring
-                                             (lambda (element)
-                                               (< element 3)))))
-   (should-not (dynaring-find-backwards ring
-                                        (lambda (element)
-                                          nil)))))
+    (should (eq seg3 (dynaring-find-backwards ring
+                                              (lambda (element)
+                                                (< element 4)))))
+    (should (eq seg1 (dynaring-find-backwards ring
+                                              (lambda (element)
+                                                (< element 3)))))
+    (should-not (dynaring-find-backwards ring
+                                         (lambda (element)
+                                           nil)))))
 
 (ert-deftest dynaring-contains-p-test ()
   ;; empty ring
@@ -693,20 +693,20 @@
   ;; 1-element ring
   (with-fixture fixture-1-ring
     (should (dynaring-contains-p ring 1))
-   (should-not (dynaring-contains-p ring 2)))
+    (should-not (dynaring-contains-p ring 2)))
 
   ;; 2-element ring
   (with-fixture fixture-2-ring
     (should (dynaring-contains-p ring 1))
-   (should (dynaring-contains-p ring 2))
-   (should-not (dynaring-contains-p ring 3)))
+    (should (dynaring-contains-p ring 2))
+    (should-not (dynaring-contains-p ring 3)))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
     (should (dynaring-contains-p ring 1))
-   (should (dynaring-contains-p ring 2))
-   (should (dynaring-contains-p ring 3))
-   (should-not (dynaring-contains-p ring 4))))
+    (should (dynaring-contains-p ring 2))
+    (should (dynaring-contains-p ring 3))
+    (should-not (dynaring-contains-p ring 4))))
 
 (ert-deftest dynaring-values-test ()
   ;; empty ring
@@ -761,17 +761,17 @@
   ;; one-element ring
   (with-fixture fixture-1-ring
     (should (dynaring-transform-map ring #'1+))
-   (should (equal (list 2) (dynaring-values ring))))
+    (should (equal (list 2) (dynaring-values ring))))
 
   ;; two-element ring
   (with-fixture fixture-2-ring
     (should (dynaring-transform-map ring #'1+))
-   (should (equal (list 2 3) (dynaring-values ring))))
+    (should (equal (list 2 3) (dynaring-values ring))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
     (should (dynaring-transform-map ring #'1+))
-   (should (equal (list 2 3 4) (dynaring-values ring)))))
+    (should (equal (list 2 3 4) (dynaring-values ring)))))
 
 (ert-deftest dynaring-filter-test ()
   ;; empty ring
@@ -832,29 +832,29 @@
   ;; one-element ring
   (with-fixture fixture-1-ring
     (should (dynaring-transform-filter ring #'cl-oddp))
-   (should (= 1 (dynaring-value ring)))
-   (should (= 1 (dynaring-size ring))))
+    (should (= 1 (dynaring-value ring)))
+    (should (= 1 (dynaring-size ring))))
   (with-fixture fixture-1-ring
     (should (dynaring-transform-filter ring #'cl-evenp))
-   (should (dynaring-empty-p ring)))
+    (should (dynaring-empty-p ring)))
 
   ;; two-element ring
   (with-fixture fixture-2-ring
     (should (dynaring-transform-filter ring #'cl-oddp))
-   (should (equal (list 1) (dynaring-values ring))))
+    (should (equal (list 1) (dynaring-values ring))))
   (with-fixture fixture-2-ring
     (should (dynaring-transform-filter ring #'cl-evenp))
-   (should (equal (list 2) (dynaring-values ring))))
+    (should (equal (list 2) (dynaring-values ring))))
 
   ;; 3-element ring
   (with-fixture fixture-3-ring
     (should (dynaring-transform-filter ring #'cl-oddp))
-   (should (equal (list 1 3) (dynaring-values ring))))
+    (should (equal (list 1 3) (dynaring-values ring))))
 
   ;; filter out all
   (with-fixture fixture-3-ring
     (should (dynaring-transform-filter ring (lambda (elem) nil)))
-   (should (dynaring-empty-p ring)))
+    (should (dynaring-empty-p ring)))
 
   ;; filter out none
   (with-fixture fixture-3-ring
