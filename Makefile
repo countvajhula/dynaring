@@ -18,7 +18,7 @@ help:
 	@echo "test       - Run ERT tests."
 
 setup-ci:
-	git clone https://github.com/countvajhula/emacs-ci.git
+	git clone -b add-test-module https://github.com/countvajhula/emacs-ci.git
 
 clean:
 	cd emacs-ci && rm -rf ci-init
