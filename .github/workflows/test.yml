@@ -60,4 +60,4 @@ jobs:
       - name: Install Package and its Dependencies
         run: make install
       - name: Report Coverage
-        run: make coverage-coveralls
+        run: make cover-coveralls
