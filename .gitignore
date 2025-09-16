@@ -8,4 +8,4 @@
 *.html
 dist
 coverage
-emacs-ci
+.emacs-ci.clone
