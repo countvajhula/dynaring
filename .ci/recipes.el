@@ -1,3 +1,1 @@
-(
- (dynaring :type git :local-repo "." :files ("*.el"))
-)
+((dynaring :type git :local-repo "." :files ("*.el")))
