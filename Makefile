@@ -1,9 +1,5 @@
 EMACS=emacs
 
-# For a single-package repo, CI_PROJECT is optional.
-# CI_PACKAGES contains the single package name.
-export CI_PACKAGES=dynaring
-
 help:
 	@echo "Run common development actions."
 	@echo
